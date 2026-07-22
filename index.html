@@ -9,26 +9,29 @@
   <img class="logo-home" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
   <div class="topnav"><a href="wiki/index.html">Wiki</a><a href="#" onclick="return false">Discord</a></div>
   
-    <button class="pin" style="left:16.88%;top:43.5%;width:9.07%;transform:translate(-50%,-50%);animation-delay:0.0s"
-      onclick="openPanel('server')"><img src="assets/btn_server.png" alt="Server Detail" draggable="false"></button>
-    <button class="pin" style="left:48.93%;top:43.6%;width:8.2%;transform:translate(-50%,-50%);animation-delay:0.45s"
-      onclick="openPanel('download')"><img src="assets/btn_download.png" alt="Download" draggable="false"></button>
-    <button class="pin" style="left:67.06%;top:53.6%;width:8.3%;transform:translate(-50%,-50%);animation-delay:0.9s"
-      onclick="openPanel('marketplace')"><img src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></button>
-    <button class="pin" style="left:58.7%;top:18.6%;width:8.34%;transform:translate(-50%,-50%);animation-delay:1.35s"
-      onclick="openPanel('donation')"><img src="assets/btn_donation.png" alt="Donation" draggable="false"></button>
-    <button class="pin" style="left:79.64%;top:13.6%;width:7.33%;transform:translate(-50%,-50%);animation-delay:1.8s"
-      onclick="openPanel('login')"><img src="assets/btn_login.png" alt="Login" draggable="false"></button>
+    <button class="pin" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
+      <span class="bob" style="animation-delay:0.0s"><img class="sway" style="animation-delay:0.0s" src="assets/btn_server.png" alt="Server Detail" draggable="false"></span>
+    </button>
+    <button class="pin" style="left:48.93%;top:43.6%;width:6.97%" onclick="openPanel('download')">
+      <span class="bob" style="animation-delay:-0.9s"><img class="sway" style="animation-delay:-1.3s" src="assets/btn_download.png" alt="Download" draggable="false"></span>
+    </button>
+    <button class="pin" style="left:67.06%;top:53.6%;width:7.06%" onclick="openPanel('marketplace')">
+      <span class="bob" style="animation-delay:-1.8s"><img class="sway" style="animation-delay:-2.6s" src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></span>
+    </button>
+    <button class="pin" style="left:58.7%;top:18.6%;width:7.09%" onclick="openPanel('donation')">
+      <span class="bob" style="animation-delay:-2.7s"><img class="sway" style="animation-delay:-3.9s" src="assets/btn_donation.png" alt="Donation" draggable="false"></span>
+    </button>
+    <button class="pin" style="left:79.64%;top:13.6%;width:6.23%" onclick="openPanel('login')">
+      <span class="bob" style="animation-delay:-3.6s"><img class="sway" style="animation-delay:-5.2s" src="assets/btn_login.png" alt="Login" draggable="false"></span>
+    </button>
   <div class="hint">Click a signpost to explore</div>
 </div></div>
-
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
   <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
     <button class="panel-close" onclick="closePanel()">&times;</button></div>
   <div class="panel-body" id="pnl-body"></div>
 </aside>
-
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 </body></html>

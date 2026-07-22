@@ -11,11 +11,13 @@ a{color:inherit}
 .topnav a:hover{background:var(--gold);color:#1a1206}
 .logo-home{position:absolute;top:2%;left:1.4%;width:5.2%;min-width:52px;cursor:pointer;z-index:6;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));transition:transform .25s}
 .logo-home:hover{transform:scale(1.08)}
-.pin{position:absolute;background:none;border:none;cursor:pointer;padding:0;z-index:4;animation:float 3.6s ease-in-out infinite}
-.pin img{width:100%;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55));transition:filter .2s}
-.pin:hover img{filter:drop-shadow(0 0 12px rgba(228,184,75,.95)) brightness(1.13)}
-.pin:active{filter:brightness(.95)}
-@keyframes float{0%,100%{transform:translate(-50%,calc(-50% - 7px))}50%{transform:translate(-50%,calc(-50% + 7px))}}
+.pin{position:absolute;background:none;border:none;cursor:pointer;padding:0;z-index:4;transform:translate(-50%,-50%)}
+.pin .bob{display:block;animation:bob 5s ease-in-out infinite}
+.pin img{width:100%;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55));transition:filter .25s;animation:sway 6.8s ease-in-out infinite;transform-origin:50% 88%}
+.pin:hover img{filter:drop-shadow(0 0 12px rgba(228,184,75,.95)) brightness(1.12)}
+.pin:active .bob{transform:scale(.97)}
+@keyframes bob{0%,100%{transform:translateY(-2.5px)}50%{transform:translateY(2.5px)}}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
 .hint{position:absolute;bottom:3%;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.8);font-size:13px;z-index:3;text-shadow:0 1px 4px #000;pointer-events:none;letter-spacing:.3px}
 /* ---- Slide-in panel ---- */
 .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
