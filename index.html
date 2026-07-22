@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>New Era Ragnarok Online — NeRO</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head><body>
+<div class="stage-wrap"><div class="stage">
+  <video class="bg" autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video>
+  <img class="logo-home" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
+  <div class="topnav"><a href="wiki/index.html">Wiki</a><a href="#" onclick="return false">Discord</a></div>
+  
+    <button class="pin" style="left:16.88%;top:43.5%;width:9.07%;transform:translate(-50%,-50%);animation-delay:0.0s"
+      onclick="openPanel('server')"><img src="assets/btn_server.png" alt="Server Detail" draggable="false"></button>
+    <button class="pin" style="left:48.93%;top:43.6%;width:8.2%;transform:translate(-50%,-50%);animation-delay:0.45s"
+      onclick="openPanel('download')"><img src="assets/btn_download.png" alt="Download" draggable="false"></button>
+    <button class="pin" style="left:67.06%;top:53.6%;width:8.3%;transform:translate(-50%,-50%);animation-delay:0.9s"
+      onclick="openPanel('marketplace')"><img src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></button>
+    <button class="pin" style="left:58.7%;top:18.6%;width:8.34%;transform:translate(-50%,-50%);animation-delay:1.35s"
+      onclick="openPanel('donation')"><img src="assets/btn_donation.png" alt="Donation" draggable="false"></button>
+    <button class="pin" style="left:79.64%;top:13.6%;width:7.33%;transform:translate(-50%,-50%);animation-delay:1.8s"
+      onclick="openPanel('login')"><img src="assets/btn_login.png" alt="Login" draggable="false"></button>
+  <div class="hint">Click a signpost to explore</div>
+</div></div>
+
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head"><i id="pnl-icon" class="ti"></i><h2 id="pnl-title"></h2>
+    <button class="panel-close" onclick="closePanel()">&times;</button></div>
+  <div class="panel-body" id="pnl-body"></div>
+</aside>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body></html>

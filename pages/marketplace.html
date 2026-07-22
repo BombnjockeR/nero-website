@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marketplace — NeRO</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head><body class="page"><div class="page-hero"><div class="glow"></div>
+  <img class="mini-logo" src="../assets/logo.png" onclick="location.href='../index.html'" alt="Home">
+  <h1>Marketplace</h1><a class="back" href="../index.html">&larr; Back</a></div><div class="wrap">
+<div class="mkt-banner"><i class="ti ti-scale"></i><div>
+  <h2>NeRO Marketplace</h2><p>Player-to-player trading. Prices shown in Rupiah (Rp).</p></div></div>
+<div class="mkt-tools">
+  <div class="mkt-search"><input id="mkt-q" placeholder="Search item name..." oninput="filterItems()"><button onclick="filterItems()"><i class="ti ti-search"></i></button></div>
+  <div class="toggle">
+    <button class="on" data-f="all" onclick="setFilter('all',this)">All</button>
+    <button data-f="sell" onclick="setFilter('sell',this)">Selling</button>
+    <button data-f="buy" onclick="setFilter('buy',this)">Buying</button>
+  </div>
+</div>
+<div class="grid" id="mkt-grid"><div class="card-item" data-type="sell" data-name="elemental sword [3]">
+      <div class="thumb"><i class="ti ti-sword"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Elemental Sword [3]</div>
+      <div class="meta">+9 · Fire · by <b style="color:#cfd8e6">AsuraLive</b></div>
+      <div class="price">Rp 350.000</div></div></div><div class="card-item" data-type="sell" data-name="valkyrie armor [1]">
+      <div class="thumb"><i class="ti ti-shield"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Valkyrie Armor [1]</div>
+      <div class="meta">+7 · by <b style="color:#cfd8e6">MerchantMei</b></div>
+      <div class="price">Rp 220.000</div></div></div><div class="card-item" data-type="buy" data-name="tao gunka card">
+      <div class="thumb"><i class="ti ti-cards"></i></div>
+      <div class="info"><span class="badge buy">Buying</span><div class="nm">Tao Gunka Card</div>
+      <div class="meta">LF: 1 · by <b style="color:#cfd8e6">GoldHoarder</b></div>
+      <div class="price">Rp 1.200.000</div></div></div><div class="card-item" data-type="sell" data-name="sniping suit [1]">
+      <div class="thumb"><i class="ti ti-shirt"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Sniping Suit [1]</div>
+      <div class="meta">+8 · by <b style="color:#cfd8e6">BraninRO</b></div>
+      <div class="price">Rp 180.000</div></div></div><div class="card-item" data-type="sell" data-name="diablos ring [1]">
+      <div class="thumb"><i class="ti ti-diamond"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Diablos Ring [1]</div>
+      <div class="meta">x2 · by <b style="color:#cfd8e6">ZenyQueen</b></div>
+      <div class="price">Rp 90.000</div></div></div><div class="card-item" data-type="buy" data-name="orleans's glove [1]">
+      <div class="thumb"><i class="ti ti-hand-stop"></i></div>
+      <div class="info"><span class="badge buy">Buying</span><div class="nm">Orleans's Glove [1]</div>
+      <div class="meta">LF: 2 · by <b style="color:#cfd8e6">PoringTV</b></div>
+      <div class="price">Rp 65.000</div></div></div><div class="card-item" data-type="sell" data-name="bloody dead branch">
+      <div class="thumb"><i class="ti ti-plant"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Bloody Dead Branch</div>
+      <div class="meta">x10 · by <b style="color:#cfd8e6">TycoonTom</b></div>
+      <div class="price">Rp 500.000</div></div></div><div class="card-item" data-type="sell" data-name="nero shadow orb">
+      <div class="thumb"><i class="ti ti-circle-dot"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Nero Shadow Orb</div>
+      <div class="meta">x50 · by <b style="color:#cfd8e6">MidgardMaster</b></div>
+      <div class="price">Rp 120.000</div></div></div><div class="card-item" data-type="buy" data-name="costume: angel wing">
+      <div class="thumb"><i class="ti ti-feather"></i></div>
+      <div class="info"><span class="badge buy">Buying</span><div class="nm">Costume: Angel Wing</div>
+      <div class="meta">LF: 1 · by <b style="color:#cfd8e6">ValkyrieVODs</b></div>
+      <div class="price">Rp 300.000</div></div></div><div class="card-item" data-type="sell" data-name="+10 physical shadow set">
+      <div class="thumb"><i class="ti ti-armchair"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">+10 Physical Shadow Set</div>
+      <div class="meta">full set · by <b style="color:#cfd8e6">CoinCollector</b></div>
+      <div class="price">Rp 800.000</div></div></div><div class="card-item" data-type="sell" data-name="fricco's shoes [1]">
+      <div class="thumb"><i class="ti ti-shoe"></i></div>
+      <div class="info"><span class="badge sell">Selling</span><div class="nm">Fricco's Shoes [1]</div>
+      <div class="meta">+7 · by <b style="color:#cfd8e6">MerchantMei</b></div>
+      <div class="price">Rp 140.000</div></div></div><div class="card-item" data-type="buy" data-name="gloom under night card">
+      <div class="thumb"><i class="ti ti-cards"></i></div>
+      <div class="info"><span class="badge buy">Buying</span><div class="nm">Gloom Under Night Card</div>
+      <div class="meta">LF: 1 · by <b style="color:#cfd8e6">AsuraLive</b></div>
+      <div class="price">Rp 950.000</div></div></div></div>
+<script>
+let curF='all';
+function setFilter(f,el){curF=f;document.querySelectorAll('.toggle button').forEach(b=>b.classList.remove('on'));el.classList.add('on');filterItems();}
+function filterItems(){
+  const q=(document.getElementById('mkt-q').value||'').toLowerCase();
+  document.querySelectorAll('.card-item').forEach(c=>{
+    const okF=curF==='all'||c.dataset.type===curF;
+    const okQ=c.dataset.name.includes(q);
+    c.style.display=(okF&&okQ)?'':'none';
+  });
+}
+</script></div></body></html>
