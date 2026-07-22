@@ -140,3 +140,35 @@ function registerHTML(){
     <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account? Login</a></div>
   `;
 }
+
+
+/* ---------- Online counter (dummy) ---------- */
+(function(){
+  var base=1180+Math.floor(Math.random()*180);
+  var el=document.getElementById('online-num');
+  function fmt(n){return n.toLocaleString('en-US');}
+  if(el){ el.textContent=fmt(base);
+    setInterval(function(){ base+=Math.floor(Math.random()*7)-3; if(base<900)base=900; el.textContent=fmt(base); },5000);
+  }
+})();
+
+/* ---------- Background music (on by default) ---------- */
+var bgm=document.getElementById('bgm');
+var musicOn=true;
+function setMusicIcon(){
+  var b=document.getElementById('music-btn'); if(!b)return;
+  b.innerHTML = musicOn ? '<i class="ti ti-music"></i>' : '<i class="ti ti-music-off"></i>';
+  b.classList.toggle('off', !musicOn);
+}
+function tryPlay(){ if(bgm){ bgm.volume=0.45; var p=bgm.play(); if(p&&p.catch)p.catch(function(){}); } }
+function toggleMusic(){
+  musicOn=!musicOn;
+  if(musicOn) tryPlay(); else bgm.pause();
+  setMusicIcon();
+}
+// attempt autoplay on load; if the browser blocks it, start on first interaction
+window.addEventListener('load', function(){
+  setMusicIcon(); tryPlay();
+  var kick=function(){ if(musicOn) tryPlay(); document.removeEventListener('click',kick); document.removeEventListener('keydown',kick); document.removeEventListener('touchstart',kick); };
+  document.addEventListener('click',kick); document.addEventListener('keydown',kick); document.addEventListener('touchstart',kick);
+});

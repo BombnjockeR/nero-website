@@ -4,9 +4,12 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 </head><body>
+<audio id="bgm" src="assets/08.mp3" loop preload="auto"></audio>
 <div class="stage-wrap"><div class="stage">
   <video class="bg" autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video>
   <img class="logo-home" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
+  <div class="online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
+  <button class="music-btn" id="music-btn" title="Toggle music" onclick="toggleMusic()"><i class="ti ti-music"></i></button>
   <div class="topnav"><a href="wiki/index.html">Wiki</a><a href="#" onclick="return false">Discord</a></div>
   
     <button class="pin" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
