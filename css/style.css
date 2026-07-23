@@ -289,10 +289,10 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
   .homebar{position:relative;padding:12px 2px 4px;gap:10px}
   .homebar .hd-logo{height:46px}
 
-  .pin-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;
-    margin:auto 0;padding:14px 0;place-items:center}
+  .pin-area{display:grid;grid-template-columns:repeat(2,minmax(0,88px));
+    gap:32px 28px;margin:auto auto;padding:18px 0;place-items:center;justify-content:center}
   .pin{position:static !important;left:auto !important;top:auto !important;
-    width:100% !important;max-width:190px;transform:none !important;
+    width:100% !important;max-width:88px;transform:none !important;
     display:flex;justify-content:center}
   .pin .bob{width:100%;animation-duration:6s}
   .pin img{width:100%;animation-duration:8s}
@@ -342,10 +342,10 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
   .mus-panel{bottom:50px}
 }
 
-/* very small phones: single column menu */
+/* very small phones: keep two columns, slightly tighter */
 @media (max-width:380px){
-  .pin-area{grid-template-columns:1fr}
-  .pin{max-width:230px}
+  .pin-area{grid-template-columns:repeat(2,minmax(0,78px));gap:28px 24px}
+  .pin{max-width:78px}
 }
 
 /* landscape phones: keep the map, just enlarge targets */
