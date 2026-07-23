@@ -208,9 +208,11 @@ function filterItems(){
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
-var MUS={idx:0,playing:false};
+var MUS={idx:0,playing:false,want:true};   /* want = user intent, survives autoplay blocking */
+var DEFAULT_VOL=0.25;                      /* 25% */
+
 function musSave(){ try{
-  sessionStorage.setItem('nero_mus',JSON.stringify({i:MUS.idx,t:bgm.currentTime,v:bgm.volume,p:MUS.playing}));
+  sessionStorage.setItem('nero_mus',JSON.stringify({i:MUS.idx,t:bgm.currentTime,v:bgm.volume,w:MUS.want}));
 }catch(e){} }
 function musLoad(){ try{ return JSON.parse(sessionStorage.getItem('nero_mus')||'null'); }catch(e){ return null; } }
 function musIcon(){
@@ -226,16 +228,27 @@ function musLoadTrack(i,autoplay,seek){
   if(!TRACKS.length) return;
   MUS.idx=(i+TRACKS.length)%TRACKS.length;
   bgm.src=ROOT+TRACKS[MUS.idx].file;
-  if(seek) bgm.currentTime=seek;
+  if(seek){ try{ bgm.currentTime=seek; }catch(e){} }
   musLabel();
   if(autoplay) musPlay();
 }
-function musPlay(){ var p=bgm.play(); MUS.playing=true; musIcon();
-  if(p&&p.catch) p.catch(function(){ MUS.playing=false; musIcon(); }); }
-function musPause(){ bgm.pause(); MUS.playing=false; musIcon(); musSave(); }
-function musToggle(){ MUS.playing?musPause():musPlay(); musSave(); }
-function musNext(){ musLoadTrack(MUS.idx+1,true); musSave(); }
-function musPick(i){ musLoadTrack(i,true); musSave(); document.getElementById('mus-panel').classList.remove('show'); }
+function musPlay(){
+  if(!bgm) return;
+  var p=bgm.play();
+  if(p && p.then){
+    p.then(function(){ MUS.playing=true; musIcon(); })
+     .catch(function(){ MUS.playing=false; musIcon(); });   /* blocked: keep want=true, retry on interaction */
+  } else { MUS.playing=true; musIcon(); }
+}
+function musPause(){ bgm.pause(); MUS.playing=false; musIcon(); }
+function musToggle(){
+  MUS.want=!MUS.playing;
+  if(MUS.want) musPlay(); else musPause();
+  musSave();
+}
+function musNext(){ MUS.want=true; musLoadTrack(MUS.idx+1,true); musSave(); }
+function musPick(i){ MUS.want=true; musLoadTrack(i,true); musSave();
+  var p=document.getElementById('mus-panel'); if(p) p.classList.remove('show'); }
 function musBuildList(){
   var p=document.getElementById('mus-panel'); if(!p) return;
   p.innerHTML='<div class="mus-title">Playlist</div>'+TRACKS.map(function(t,i){
@@ -245,28 +258,43 @@ function musBuildList(){
 (function initMusic(){
   if(!bgm) return;
   var saved=musLoad();
-  var vol = saved && typeof saved.v==='number' ? saved.v : 0.5;   /* default 50% */
+  var vol = (saved && typeof saved.v==='number') ? saved.v : DEFAULT_VOL;
   bgm.volume=vol;
+  MUS.want = saved ? saved.w!==false : true;   /* on by default */
+
   var volEl=document.getElementById('mus-vol');
   if(volEl){ volEl.value=Math.round(vol*100);
     volEl.addEventListener('input',function(){ bgm.volume=this.value/100; musSave(); }); }
+
   musBuildList();
   musLoadTrack(saved?saved.i:0,false,saved?saved.t:0);
   bgm.addEventListener('ended',function(){ musNext(); });
-  bgm.addEventListener('timeupdate',function(){ if(MUS.playing && Math.floor(bgm.currentTime)%3===0) musSave(); });
+  bgm.addEventListener('play', function(){ MUS.playing=true;  musIcon(); });
+  bgm.addEventListener('pause',function(){ MUS.playing=false; musIcon(); });
+  var tick=0;
+  bgm.addEventListener('timeupdate',function(){ if(++tick%20===0) musSave(); });
+
   var tg=document.getElementById('mus-toggle'); if(tg) tg.addEventListener('click',musToggle);
   var nx=document.getElementById('mus-next');   if(nx) nx.addEventListener('click',musNext);
   var lb=document.getElementById('mus-list-btn');
   if(lb) lb.addEventListener('click',function(e){ e.stopPropagation();
     document.getElementById('mus-panel').classList.toggle('show'); });
   document.addEventListener('click',function(){ var p=document.getElementById('mus-panel'); if(p)p.classList.remove('show'); });
-  /* autoplay: on by default, resume after first interaction if blocked */
-  var want = saved ? saved.p!==false : true;
-  if(want){ musPlay();
-    var kick=function(){ if(!MUS.playing&&want) musPlay();
-      document.removeEventListener('click',kick); document.removeEventListener('keydown',kick); document.removeEventListener('touchstart',kick); };
-    document.addEventListener('click',kick); document.addEventListener('keydown',kick); document.addEventListener('touchstart',kick);
-  } else { musIcon(); }
+
+  /* try immediately; if the browser blocks audio, start on the very first user gesture */
+  if(MUS.want){
+    musPlay();
+    var evts=['pointerdown','mousedown','mousemove','keydown','touchstart','scroll','wheel'];
+    var kick=function(){
+      if(MUS.want && bgm.paused){ musPlay(); }
+      if(!bgm.paused){ evts.forEach(function(e){ document.removeEventListener(e,kick,true); }); }
+    };
+    evts.forEach(function(e){ document.addEventListener(e,kick,true); });
+    document.addEventListener('visibilitychange',function(){
+      if(!document.hidden && MUS.want && bgm.paused) musPlay();
+    });
+  }
+  musIcon();
 })();
 
 /* ================= WIKI SEARCH ================= */
