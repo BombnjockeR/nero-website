@@ -10,14 +10,22 @@ function renderAcct(){
   /* hide the LOGIN signpost once logged in (avoids duplicate entry points) */
   var lp=document.getElementById('pin-login');
   if(lp) lp.style.display = Auth.loggedIn ? 'none' : '';
+
   var el=document.getElementById('hd-acct'); if(!el) return;
+  var isHome = !!document.querySelector('.homebar');
+  var disc='<a class="btn-discord" href="'+DISCORD_URL+'"'+
+           (DISCORD_URL==='#'?' onclick="alert(\'Discord invite link coming soon\');return false;"':' target="_blank" rel="noopener"')+
+           ' title="Join our Discord"><i class="ti ti-brand-discord"></i><span>Discord</span></a>';
+  var html=disc;
   if(Auth.loggedIn){
     var n=Auth.user()||'Adventurer';
-    el.innerHTML='<div class="acct-chip" onclick="openPanel(\'account\')">'+
+    html+='<div class="acct-chip" onclick="openPanel(\'account\')">'+
       '<div class="acct-av">'+initials(n)+'</div><span class="acct-nm">'+n+'</span></div>';
-  } else {
-    el.innerHTML='<button class="btn-login" onclick="openPanel(\'login\')"><i class="ti ti-login"></i> Login</button>';
+  } else if(!isHome){
+    /* subpages have no floating signpost, so keep a login entry there */
+    html+='<button class="btn-login" onclick="openPanel(\'login\')"><i class="ti ti-login"></i> Login</button>';
   }
+  el.innerHTML=html;
 }
 
 /* ================= SLIDE PANEL ================= */
@@ -32,7 +40,7 @@ function openPanel(type){
   if(type==='marketplace'){ location.href=ROOT+'pages/marketplace.html'; return; }
   if(type==='login' && Auth.loggedIn) type='account';
   if(type==='donation' && !Auth.loggedIn) type='login';
-  if(!panel){ location.href=ROOT+'index.html'; return; }
+  if(!panel){ location.href=ROOT||'./'; return; }
   document.getElementById('pnl-icon').className='ti '+ICONS[type];
   document.getElementById('pnl-title').textContent=TITLES[type];
   document.getElementById('pnl-body').innerHTML=render(type);

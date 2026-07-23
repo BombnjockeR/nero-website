@@ -15,6 +15,9 @@ const TRACKS = [
   {title:"Theme of Prontera",      file:"assets/08.mp3"}
 ];
 
+/* Discord invite — replace with your real server invite link */
+const DISCORD_URL = "#";
+
 /* Session auth (demo only) */
 const Auth = {
   get loggedIn(){ return sessionStorage.getItem("nero_login")==="1"; },
