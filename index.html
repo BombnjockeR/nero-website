@@ -1,31 +1,32 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>New Era Ragnarok Online — NeRO</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
-</head><body>
-<audio id="bgm" src="assets/08.mp3" loop preload="auto"></audio>
+</head><body class="landing">
 <div class="stage-wrap"><div class="stage">
   <video class="bg" autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video>
-  <img class="logo-home" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
-  <div class="online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
-  <button class="music-btn" id="music-btn" title="Toggle music" onclick="toggleMusic()"><i class="ti ti-music"></i></button>
-  <div class="topnav"><a href="wiki/index.html">Wiki</a><a href="#" onclick="return false">Discord</a></div>
+  <header class="sitehead">
+  <img class="hd-logo" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
+  <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
+  <nav class="hd-tabs"><a class="tab" href="wiki/index.html">Wiki</a><a class="tab" href="pages/stat-woe.html">WoE</a><a class="tab" href="pages/stat-pvp.html">PvP</a><a class="tab" href="pages/stat-mvp.html">MVP</a><a class="tab" href="pages/stat-zeny.html">Zeny</a><a class="tab" href="pages/marketplace.html">Market</a></nav>
+  <div class="hd-acct" id="hd-acct"></div>
+</header>
   
     <button class="pin" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
-      <span class="bob" style="animation-delay:0.0s"><img class="sway" style="animation-delay:0.0s" src="assets/btn_server.png" alt="Server Detail" draggable="false"></span>
+      <span class="bob" style="animation-delay:0.0s"><img style="animation-delay:0.0s" src="assets/btn_server.png" alt="Server Detail" draggable="false"></span>
     </button>
     <button class="pin" style="left:48.93%;top:43.6%;width:6.97%" onclick="openPanel('download')">
-      <span class="bob" style="animation-delay:-0.9s"><img class="sway" style="animation-delay:-1.3s" src="assets/btn_download.png" alt="Download" draggable="false"></span>
+      <span class="bob" style="animation-delay:-0.9s"><img style="animation-delay:-1.3s" src="assets/btn_download.png" alt="Download" draggable="false"></span>
     </button>
     <button class="pin" style="left:67.06%;top:53.6%;width:7.06%" onclick="openPanel('marketplace')">
-      <span class="bob" style="animation-delay:-1.8s"><img class="sway" style="animation-delay:-2.6s" src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></span>
+      <span class="bob" style="animation-delay:-1.8s"><img style="animation-delay:-2.6s" src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></span>
     </button>
     <button class="pin" style="left:58.7%;top:18.6%;width:7.09%" onclick="openPanel('donation')">
-      <span class="bob" style="animation-delay:-2.7s"><img class="sway" style="animation-delay:-3.9s" src="assets/btn_donation.png" alt="Donation" draggable="false"></span>
+      <span class="bob" style="animation-delay:-2.7s"><img style="animation-delay:-3.9s" src="assets/btn_donation.png" alt="Donation" draggable="false"></span>
     </button>
     <button class="pin" style="left:79.64%;top:13.6%;width:6.23%" onclick="openPanel('login')">
-      <span class="bob" style="animation-delay:-3.6s"><img class="sway" style="animation-delay:-5.2s" src="assets/btn_login.png" alt="Login" draggable="false"></span>
+      <span class="bob" style="animation-delay:-3.6s"><img style="animation-delay:-5.2s" src="assets/btn_login.png" alt="Login" draggable="false"></span>
     </button>
   <div class="hint">Click a signpost to explore</div>
 </div></div>
@@ -35,6 +36,16 @@
     <button class="panel-close" onclick="closePanel()">&times;</button></div>
   <div class="panel-body" id="pnl-body"></div>
 </aside>
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+<div class="music" id="music">
+  <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
+  <div class="mus-mid">
+    <div class="mus-track" id="mus-track">—</div>
+    <input class="mus-vol" id="mus-vol" type="range" min="0" max="100" value="50" title="Volume">
+  </div>
+  <button class="mus-next" id="mus-next" title="Next track"><i class="ti ti-player-track-next"></i></button>
+  <button class="mus-list" id="mus-list-btn" title="Playlist"><i class="ti ti-playlist"></i></button>
+  <div class="mus-panel" id="mus-panel"></div>
+</div>
+<audio id="bgm" preload="auto"></audio>
+<script src="js/data.js"></script><script src="js/app.js"></script>
 </body></html>

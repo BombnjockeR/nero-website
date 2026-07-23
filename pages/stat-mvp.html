@@ -3,6 +3,32 @@
 <title>MVP Statistics — NeRO</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
-</head><body class="page"><div class="page-hero"><div class="glow"></div>
-  <img class="mini-logo" src="../assets/logo.png" onclick="location.href='../index.html'" alt="Home">
-  <h1>MVP Statistics</h1><a class="back" href="../index.html">&larr; Back</a></div><div class="wrap"><p class="subtitle">Top MVP hunters this month.</p><table class="stat"><thead><tr><th>#</th><th>Player</th><th>MVP Kills</th><th>Favorite MVP</th><th>Points</th></tr></thead><tbody><tr><td class="rank">1</td><td class="">MidgardMaster</td><td class="">312</td><td class="">Ifrit</td><td class="">624</td></tr><tr><td class="rank">2</td><td class="">AsuraLive</td><td class="">288</td><td class="">Baphomet</td><td class="">576</td></tr><tr><td class="rank">3</td><td class="">BraninRO</td><td class="">245</td><td class="">Valkyrie Randgris</td><td class="">490</td></tr><tr><td class="rank">4</td><td class="">PoringTV</td><td class="">210</td><td class="">Golden Thief Bug</td><td class="">420</td></tr><tr><td class="rank">5</td><td class="">ValkyrieVODs</td><td class="">188</td><td class="">Tao Gunka</td><td class="">376</td></tr></tbody></table></div></body></html>
+</head><body class="page">
+<div class="pagebg"><video autoplay muted loop playsinline><source src="../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<header class="sitehead">
+  <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../index.html'">
+  <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
+  <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab on" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab" href="../pages/marketplace.html">Market</a></nav>
+  <div class="hd-acct" id="hd-acct"></div>
+</header>
+<div class="wrap">
+  <h1 class="pg-title">MVP Statistics</h1>
+  <p class="subtitle">Top MVP hunters this month.</p>
+  <div class="searchbar"><i class="ti ti-search"></i>
+    <input id="tblsearch" placeholder="Search player or MVP name..." oninput="filterTable()">
+    <span class="hits" id="hits"></span></div>
+  <table class="stat" id="stbl"><thead><tr><th>#</th><th>Player</th><th>MVP Kills</th><th>Favorite MVP</th><th>Points</th></tr></thead><tbody><tr><td class="rank">1</td><td class="">MidgardMaster</td><td class="">312</td><td class="">Ifrit</td><td class="">624</td></tr><tr><td class="rank">2</td><td class="">AsuraLive</td><td class="">288</td><td class="">Baphomet</td><td class="">576</td></tr><tr><td class="rank">3</td><td class="">BraninRO</td><td class="">245</td><td class="">Valkyrie Randgris</td><td class="">490</td></tr><tr><td class="rank">4</td><td class="">PoringTV</td><td class="">210</td><td class="">Golden Thief Bug</td><td class="">420</td></tr><tr><td class="rank">5</td><td class="">ValkyrieVODs</td><td class="">188</td><td class="">Tao Gunka</td><td class="">376</td></tr><tr><td class="rank">6</td><td class="">NightBlade</td><td class="">164</td><td class="">Thanatos</td><td class="">328</td></tr><tr><td class="rank">7</td><td class="">StormCaller</td><td class="">151</td><td class="">Lord of Death</td><td class="">302</td></tr><tr><td class="rank">8</td><td class="">HolyLance</td><td class="">133</td><td class="">Amon Ra</td><td class="">266</td></tr></tbody></table>
+</div>
+<div class="music" id="music">
+  <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
+  <div class="mus-mid">
+    <div class="mus-track" id="mus-track">—</div>
+    <input class="mus-vol" id="mus-vol" type="range" min="0" max="100" value="50" title="Volume">
+  </div>
+  <button class="mus-next" id="mus-next" title="Next track"><i class="ti ti-player-track-next"></i></button>
+  <button class="mus-list" id="mus-list-btn" title="Playlist"><i class="ti ti-playlist"></i></button>
+  <div class="mus-panel" id="mus-panel"></div>
+</div>
+<audio id="bgm" preload="auto"></audio>
+<script src="../js/data.js"></script><script src="../js/app.js"></script>
+</body></html>
