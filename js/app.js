@@ -1,8 +1,8 @@
-/* ROOT: relative prefix so links work at any depth */
+/* ROOT: absolute site root, stays correct at any depth and after SPA navigation */
 const ROOT = (function(){
-  var s=document.querySelector('script[src*="js/app.js"]');
-  var rel = s ? s.getAttribute('src').replace(/js\/app\.js$/,'') : './';
-  try{ return new URL(rel||'./', location.href).href; }catch(e){ return rel; }
+  var sc=document.querySelector('script[src*="js/app.js"]');
+  var rel=sc ? sc.getAttribute('src').replace(/js\/app\.js.*$/,'') : '';
+  return new URL(rel||'./', location.href).href;
 })();
 
 /* ================= ACCOUNT CHIP ================= */
@@ -30,8 +30,8 @@ function renderAcct(){
 }
 
 /* ================= SLIDE PANEL ================= */
-var panel=document.getElementById('panel');
-var backdrop=document.getElementById('backdrop');
+function $panel(){ return document.getElementById('panel'); }
+function $backdrop(){ return document.getElementById('backdrop'); }
 var ICONS={server:'ti-scroll',download:'ti-download',marketplace:'ti-scale',donation:'ti-heart',
            login:'ti-login',register:'ti-user-plus',account:'ti-user-circle'};
 var TITLES={server:'Server Detail',download:'Download',donation:'Donation',
@@ -41,14 +41,19 @@ function openPanel(type){
   if(type==='marketplace'){ location.href=ROOT+'pages/marketplace.html'; return; }
   if(type==='login' && Auth.loggedIn) type='account';
   if(type==='donation' && !Auth.loggedIn) type='login';
-  if(!panel){ location.href=ROOT||'./'; return; }
+  var panel=$panel(), backdrop=$backdrop();
+  if(!panel){ location.href=ROOT; return; }
   document.getElementById('pnl-icon').className='ti '+ICONS[type];
   document.getElementById('pnl-title').textContent=TITLES[type];
   document.getElementById('pnl-body').innerHTML=render(type);
   if(type==='donation') selAmt=null;
   panel.classList.add('show'); backdrop.classList.add('show');
 }
-function closePanel(){ if(panel){panel.classList.remove('show');backdrop.classList.remove('show');} }
+function closePanel(){
+  var p=$panel(), b=$backdrop();
+  if(p) p.classList.remove('show');
+  if(b) b.classList.remove('show');
+}
 function render(t){
   if(t==='login')    return loginHTML();
   if(t==='register') return registerHTML();
@@ -198,14 +203,15 @@ function filterItems(){
 }
 
 /* ================= ONLINE COUNTER ================= */
-(function(){
-  var el=document.getElementById('online-num'); if(!el) return;
-  var n=parseInt(sessionStorage.getItem('nero_online')||'0',10);
-  if(!n){ n=1180+Math.floor(Math.random()*180); }
-  el.textContent=fmtNum(n);
-  setInterval(function(){ n+=Math.floor(Math.random()*7)-3; if(n<900)n=900;
-    sessionStorage.setItem('nero_online',n); el.textContent=fmtNum(n); },5000);
-})();
+var ONLINE = parseInt(sessionStorage.getItem('nero_online')||'0',10) || (1180+Math.floor(Math.random()*180));
+function paintOnline(){
+  var el=document.getElementById('online-num');
+  if(el) el.textContent=fmtNum(ONLINE);
+}
+setInterval(function(){
+  ONLINE+=Math.floor(Math.random()*7)-3; if(ONLINE<900)ONLINE=900;
+  sessionStorage.setItem('nero_online',ONLINE); paintOnline();
+},5000);
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
@@ -333,7 +339,69 @@ function wikiSearch(){
   }).join('');
 }
 
-renderAcct();
+/* ================= SPA ROUTER ================= */
+function afterPageLoad(){
+  renderAcct();
+  paintOnline();
+  curF='all';                       /* reset marketplace filter state */
+  selAmt=null;
+}
+
+(function router(){
+  if(!window.history || !window.fetch) return;
+
+  var bar=document.createElement('div');
+  bar.id='nav-progress'; document.body.appendChild(bar);
+  function start(){ bar.classList.add('go'); bar.style.width='70%'; }
+  function done(){ bar.style.width='100%';
+    setTimeout(function(){ bar.classList.remove('go'); bar.style.width='0'; },260); }
+
+  function samePage(a,b){ return a.split('#')[0]===b.split('#')[0]; }
+
+  function swap(url,push){
+    start();
+    fetch(url,{credentials:'same-origin'}).then(function(r){
+      if(!r.ok) throw new Error('http '+r.status);
+      return r.text();
+    }).then(function(html){
+      var doc=new DOMParser().parseFromString(html,'text/html');
+      var fresh=doc.getElementById('app');
+      if(!fresh) throw new Error('no #app');
+      /* push state BEFORE inserting so relative URLs resolve against the new path */
+      if(push) history.pushState({spa:1},'',url);
+      document.body.className=doc.body.className;
+      var imported=document.importNode(fresh,true);   /* node comes from another document */
+      document.getElementById('app').replaceWith(imported);
+      var t=doc.querySelector('title');
+      if(t) document.title=t.textContent;
+      window.scrollTo(0,0);
+      afterPageLoad();
+      done();
+    }).catch(function(){ location.href=url; });   /* any problem -> normal navigation */
+  }
+
+  document.addEventListener('click',function(e){
+    if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+    var a=e.target.closest && e.target.closest('a[href]');
+    if(!a) return;
+    if(a.target && a.target!=='' && a.target!=='_self') return;
+    if(a.hasAttribute('download')) return;
+    var href=a.getAttribute('href');
+    if(!href||href.charAt(0)==='#'||/^(mailto:|tel:|javascript:)/i.test(href)) return;
+    var url;
+    try{ url=new URL(href,location.href); }catch(err){ return; }
+    if(url.origin!==location.origin) return;
+    if(!/\.html$|\/$/.test(url.pathname)) return;
+    if(samePage(url.href,location.href)){ e.preventDefault(); return; }
+    e.preventDefault();
+    closePanel();
+    swap(url.href,true);
+  });
+
+  window.addEventListener('popstate',function(){ swap(location.href,false); });
+})();
+
+afterPageLoad();
 
 
 /* ================= WIKI SPA ROUTER =================

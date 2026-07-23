@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 </head><body class="page">
 <div class="pagebg"><video autoplay muted loop playsinline><source src="../../assets/nero_landingpage.mp4" type="video/mp4"></video><div class="pagebg-veil"></div></div>
+<div id="app">
 <header class="sitehead">
   <img class="hd-logo" src="../../assets/logo.png" alt="Home" title="Home" onclick="location.href='../../'">
   <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
@@ -100,6 +101,7 @@
     <button class="panel-close" onclick="closePanel()">&times;</button></div>
   <div class="panel-body" id="pnl-body"></div>
 </aside>
+</div>
 <div class="music" id="music">
   <button class="mus-toggle" id="mus-toggle" title="Play / pause"><i class="ti ti-player-play"></i></button>
   <div class="mus-mid">
@@ -111,6 +113,5 @@
   <div class="mus-panel" id="mus-panel"></div>
 </div>
 <audio id="bgm" preload="auto"></audio>
-<script src="../../js/wiki-index.js"></script>
-<script src="../../js/data.js"></script><script src="../../js/app.js"></script>
+<script src="../../js/data.js"></script><script src="../../js/wiki-index.js"></script><script src="../../js/app.js"></script>
 </body></html>
