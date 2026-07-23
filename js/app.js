@@ -343,6 +343,9 @@ function wikiSearch(){
 function afterPageLoad(){
   renderAcct();
   paintOnline();
+  /* mobile: close the wiki contents drawer after navigating */
+  var side=document.querySelector('.wiki-side');
+  if(side) side.classList.remove('open');
   curF='all';                       /* reset marketplace filter state */
   selAmt=null;
 }
