@@ -1,7 +1,8 @@
 /* ROOT: relative prefix so links work at any depth */
 const ROOT = (function(){
   var s=document.querySelector('script[src*="js/app.js"]');
-  return s ? s.getAttribute('src').replace(/js\/app\.js$/,'') : '';
+  var rel = s ? s.getAttribute('src').replace(/js\/app\.js$/,'') : './';
+  try{ return new URL(rel||'./', location.href).href; }catch(e){ return rel; }
 })();
 
 /* ================= ACCOUNT CHIP ================= */
@@ -333,3 +334,95 @@ function wikiSearch(){
 }
 
 renderAcct();
+
+
+/* ================= WIKI SPA ROUTER =================
+   Keeps one shell and swaps only the article, so navigating the wiki
+   never reloads the page (music, scroll chrome and state persist).
+   Each page still exists as a real .html file, so direct links,
+   refresh, and no-JS browsers all continue to work. */
+(function(){
+  var main=document.getElementById('wiki-main');
+  if(!main || !window.history || !window.fetch || !window.DOMParser) return;
+
+  function norm(u){
+    try{ var x=new URL(u, location.href);
+         return (x.origin+x.pathname).replace(/index\.html$/,''); }
+    catch(e){ return String(u); }
+  }
+  var WIKI_BASE=norm(ROOT+'wiki/');
+
+  /* freeze persistent chrome links as absolute URLs */
+  document.querySelectorAll('.wiki-side a, .sitehead a, .homebar a').forEach(function(a){
+    a.setAttribute('href', a.href);
+  });
+
+  function setActive(){
+    var cur=norm(location.href);
+    document.querySelectorAll('.wiki-side .wk-nav a').forEach(function(a){
+      a.classList.toggle('active', norm(a.href)===cur);
+    });
+  }
+
+  function absolutize(node, base){
+    node.querySelectorAll('a[href]').forEach(function(a){
+      var r=a.getAttribute('href');
+      if(!r || /^(https?:|mailto:|tel:|#)/i.test(r)) return;
+      try{ a.setAttribute('href', new URL(r, base).href); }catch(e){}
+    });
+    node.querySelectorAll('img[src]').forEach(function(i){
+      var r=i.getAttribute('src');
+      if(!r || /^(https?:|data:)/i.test(r)) return;
+      try{ i.setAttribute('src', new URL(r, base).href); }catch(e){}
+    });
+  }
+
+  var bar=document.createElement('div');
+  bar.className='wk-progress';
+  document.body.appendChild(bar);
+
+  function go(url, push){
+    bar.classList.add('on');
+    fetch(url,{credentials:'same-origin'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function(html){
+        var doc=new DOMParser().parseFromString(html,'text/html');
+        var nm=doc.getElementById('wiki-main');
+        if(!nm) throw new Error('no content');
+        absolutize(nm,url);
+        main.innerHTML=nm.innerHTML;
+        var t=doc.querySelector('title');
+        if(t) document.title=t.textContent;
+        if(push) history.pushState({spa:1},'',url);
+        setActive();
+        /* replay the fade */
+        main.classList.remove('swap'); void main.offsetWidth; main.classList.add('swap');
+        window.scrollTo(0,0);
+        var sb=document.querySelector('.wiki-side'); if(sb) sb.classList.remove('open');
+        var q=document.getElementById('wikisearch');
+        if(q && q.value){ q.value=''; wikiSearch(); }
+        bar.classList.remove('on');
+      })
+      .catch(function(){ bar.classList.remove('on'); location.href=url; });
+  }
+
+  document.addEventListener('click',function(e){
+    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0) return;
+    var a=e.target && e.target.closest ? e.target.closest('a') : null;
+    if(!a) return;
+    if(a.hasAttribute('download')) return;
+    if(a.target && a.target!=='_self') return;
+    var raw=a.getAttribute('href');
+    if(!raw || raw.charAt(0)==='#') return;
+    var url;
+    try{ url=new URL(a.href, location.href); }catch(err){ return; }
+    if(url.origin!==location.origin) return;
+    if(norm(url.href).indexOf(WIKI_BASE)!==0) return;      /* wiki pages only */
+    e.preventDefault();
+    if(norm(url.href)===norm(location.href)){ window.scrollTo(0,0); return; }
+    go(url.href,true);
+  });
+
+  window.addEventListener('popstate',function(){ go(location.href,false); });
+  setActive();
+})();
