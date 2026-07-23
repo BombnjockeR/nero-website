@@ -11,7 +11,8 @@ const SERVER_INFO = {base:"x30", job:"x30", drop:"x30", maxbase:"99", maxjob:"70
 
 /* Music playlist — add more tracks here as you upload them */
 const TRACKS = [
-  {title:"NeRO Theme 08", file:"assets/08.mp3"}
+  {title:"The Place We Call Home", file:"assets/place_we_call_home.mp3"},
+  {title:"Theme of Prontera",      file:"assets/08.mp3"}
 ];
 
 /* Session auth (demo only) */

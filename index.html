@@ -6,26 +6,25 @@
 </head><body class="landing">
 <div class="stage-wrap"><div class="stage">
   <video class="bg" autoplay muted loop playsinline><source src="assets/nero_landingpage.mp4" type="video/mp4"></video>
-  <header class="sitehead">
+  <div class="homebar">
   <img class="hd-logo" src="assets/logo.png" alt="Home" title="Home" onclick="location.href='index.html'">
   <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
-  <nav class="hd-tabs"><a class="tab" href="wiki/index.html">Wiki</a><a class="tab" href="pages/stat-woe.html">WoE</a><a class="tab" href="pages/stat-pvp.html">PvP</a><a class="tab" href="pages/stat-mvp.html">MVP</a><a class="tab" href="pages/stat-zeny.html">Zeny</a><a class="tab" href="pages/marketplace.html">Market</a></nav>
   <div class="hd-acct" id="hd-acct"></div>
-</header>
+</div>
   
-    <button class="pin" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
+    <button class="pin" id="pin-server" style="left:16.88%;top:43.5%;width:7.71%" onclick="openPanel('server')">
       <span class="bob" style="animation-delay:0.0s"><img style="animation-delay:0.0s" src="assets/btn_server.png" alt="Server Detail" draggable="false"></span>
     </button>
-    <button class="pin" style="left:48.93%;top:43.6%;width:6.97%" onclick="openPanel('download')">
+    <button class="pin" id="pin-download" style="left:48.93%;top:43.6%;width:6.97%" onclick="openPanel('download')">
       <span class="bob" style="animation-delay:-0.9s"><img style="animation-delay:-1.3s" src="assets/btn_download.png" alt="Download" draggable="false"></span>
     </button>
-    <button class="pin" style="left:67.06%;top:53.6%;width:7.06%" onclick="openPanel('marketplace')">
+    <button class="pin" id="pin-marketplace" style="left:67.06%;top:53.6%;width:7.06%" onclick="openPanel('marketplace')">
       <span class="bob" style="animation-delay:-1.8s"><img style="animation-delay:-2.6s" src="assets/btn_marketplace.png" alt="Marketplace" draggable="false"></span>
     </button>
-    <button class="pin" style="left:58.7%;top:18.6%;width:7.09%" onclick="openPanel('donation')">
+    <button class="pin" id="pin-donation" style="left:58.7%;top:18.6%;width:7.09%" onclick="openPanel('donation')">
       <span class="bob" style="animation-delay:-2.7s"><img style="animation-delay:-3.9s" src="assets/btn_donation.png" alt="Donation" draggable="false"></span>
     </button>
-    <button class="pin" style="left:79.64%;top:13.6%;width:6.23%" onclick="openPanel('login')">
+    <button class="pin" id="pin-login" style="left:79.64%;top:13.6%;width:6.23%" onclick="openPanel('login')">
       <span class="bob" style="animation-delay:-3.6s"><img style="animation-delay:-5.2s" src="assets/btn_login.png" alt="Login" draggable="false"></span>
     </button>
   <div class="hint">Click a signpost to explore</div>

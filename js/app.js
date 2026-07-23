@@ -7,6 +7,9 @@ const ROOT = (function(){
 /* ================= ACCOUNT CHIP ================= */
 function initials(n){ return (n||'A').trim().charAt(0).toUpperCase(); }
 function renderAcct(){
+  /* hide the LOGIN signpost once logged in (avoids duplicate entry points) */
+  var lp=document.getElementById('pin-login');
+  if(lp) lp.style.display = Auth.loggedIn ? 'none' : '';
   var el=document.getElementById('hd-acct'); if(!el) return;
   if(Auth.loggedIn){
     var n=Auth.user()||'Adventurer';
@@ -257,5 +260,40 @@ function musBuildList(){
     document.addEventListener('click',kick); document.addEventListener('keydown',kick); document.addEventListener('touchstart',kick);
   } else { musIcon(); }
 })();
+
+/* ================= WIKI SEARCH ================= */
+function esc(t){ return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function wikiSearch(){
+  var box=document.getElementById('wikisearch'); if(!box||typeof WIKI_INDEX==='undefined') return;
+  var q=(box.value||'').trim().toLowerCase();
+  var res=document.getElementById('wk-results');
+  var nav=document.getElementById('wk-nav');
+  if(q.length<2){ res.classList.remove('show'); res.innerHTML=''; nav.classList.remove('hidden'); return; }
+  nav.classList.add('hidden'); res.classList.add('show');
+  var hits=[];
+  WIKI_INDEX.forEach(function(p){
+    var t=p.t.toLowerCase(), x=p.x.toLowerCase();
+    var score=0, pos=-1;
+    if(t.indexOf(q)>-1) score+=100;
+    pos=x.indexOf(q);
+    if(pos>-1) score+=20;
+    if(score>0) hits.push({p:p,score:score,pos:pos});
+  });
+  hits.sort(function(a,b){return b.score-a.score;});
+  if(!hits.length){ res.innerHTML='<div class="wk-none">No pages found for "'+q+'"</div>'; return; }
+  var re=new RegExp('('+esc(q)+')','ig');
+  res.innerHTML=hits.slice(0,12).map(function(h){
+    var snip='';
+    if(h.pos>-1){
+      var st=Math.max(0,h.pos-40);
+      snip=h.p.x.substr(st,120).replace(re,'<mark>$1</mark>');
+      snip=(st>0?'…':'')+snip+'…';
+    }
+    return '<a class="wk-res" href="'+ROOT+h.p.u+'">'+
+      '<div class="rt">'+h.p.t.replace(re,'<mark>$1</mark>')+'</div>'+
+      '<div class="rs">'+h.p.s+'</div>'+
+      (snip?'<div class="rx">'+snip+'</div>':'')+'</a>';
+  }).join('');
+}
 
 renderAcct();
