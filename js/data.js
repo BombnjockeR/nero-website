@@ -1,4 +1,29 @@
-/* ================= MOCK DATA — replace with backend later ================= */
+/* =================================================================
+   BACKEND
+   Set API_BASE to your live API to switch from placeholder data.
+   Leave it "" to keep using the mock data below.
+   Example: "https://api.newera-ro.com/api"
+   ================================================================= */
+const API_BASE = "";
+
+const NeroAPI = {
+  enabled(){ return typeof API_BASE === "string" && API_BASE.length > 0; },
+  async get(type){
+    if(!this.enabled()) return null;
+    try{
+      const ctl = new AbortController();
+      const t = setTimeout(()=>ctl.abort(), 6000);       /* never hang the UI */
+      const r = await fetch(API_BASE + "/stats.php?type=" + encodeURIComponent(type),
+                            {signal: ctl.signal, credentials: "omit"});
+      clearTimeout(t);
+      if(!r.ok) return null;
+      const j = await r.json();
+      return (j && j.ok) ? j.data : null;
+    }catch(e){ return null; }                            /* fall back silently */
+  }
+};
+
+/* ================= MOCK DATA — used until API_BASE is set ================= */
 const STREAMERS = ["AsuraLive","PoringTV","ValkyrieVODs","MidgardMaster","BraninRO"];
 const GUILDS    = ["Valhalla","Nidhogg","Ragnarok Elite","Prontera Knights","Shadow Covenant"];
 

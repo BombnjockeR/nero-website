@@ -208,10 +208,19 @@ function paintOnline(){
   var el=document.getElementById('online-num');
   if(el) el.textContent=fmtNum(ONLINE);
 }
-setInterval(function(){
-  ONLINE+=Math.floor(Math.random()*7)-3; if(ONLINE<900)ONLINE=900;
-  sessionStorage.setItem('nero_online',ONLINE); paintOnline();
-},5000);
+async function refreshOnline(){
+  var d = await NeroAPI.get('online');
+  if(d && typeof d.characters === 'number'){
+    ONLINE = d.characters;                      /* real number from the game DB */
+  }else if(!NeroAPI.enabled()){
+    ONLINE += Math.floor(Math.random()*7)-3;    /* demo drift only */
+    if(ONLINE<900) ONLINE=900;
+  }
+  sessionStorage.setItem('nero_online',ONLINE);
+  paintOnline();
+}
+setInterval(refreshOnline, NeroAPI.enabled()? 30000 : 5000);
+refreshOnline();
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
@@ -339,6 +348,44 @@ function wikiSearch(){
   }).join('');
 }
 
+/* ================= LIVE STAT TABLES ================= */
+function tdRow(cells){
+  return '<tr>'+cells.map(function(c,i){
+    return '<td class="'+(i===0?'rank':'')+'">'+c+'</td>';
+  }).join('')+'</tr>';
+}
+async function hydrateTable(){
+  var tbl=document.getElementById('stbl');
+  if(!tbl) return;
+  var key=tbl.getAttribute('data-api');
+  if(!key || !NeroAPI.enabled()) return;          /* keep placeholder rows */
+
+  var d=await NeroAPI.get(key);
+  if(!d) return;
+  var rows=[], i=1;
+
+  if(key==='zeny' && Array.isArray(d)){
+    d.forEach(function(r){
+      rows.push(tdRow([i++, r.name, fmtNum(r.zeny), r.base_level, r.guild||'—']));
+    });
+  } else if(key==='woe' && d.guilds){
+    d.guilds.forEach(function(g){
+      rows.push(tdRow([i++, g.name, g.castles, g.average_lv, g.connect_member+' / '+g.max_member]));
+    });
+  } else if(key==='mvp'){
+    if(!d.available) return;
+    d.rows.forEach(function(r){
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), '—', fmtNum(r.kills*2)]));
+    });
+  } else if(key==='pvp'){
+    if(!d.available) return;
+    d.rows.forEach(function(r){
+      rows.push(tdRow([i++, r.name, fmtNum(r.kills), fmtNum(r.deaths), r.kd, fmtNum(r.points)]));
+    });
+  }
+  if(rows.length) tbl.tBodies[0].innerHTML=rows.join('');
+}
+
 /* ================= SPA ROUTER ================= */
 function afterPageLoad(){
   renderAcct();
@@ -348,6 +395,7 @@ function afterPageLoad(){
   if(side) side.classList.remove('open');
   curF='all';                       /* reset marketplace filter state */
   selAmt=null;
+  hydrateTable();                   /* pull live rows if the API is on */
 }
 
 (function router(){
