@@ -477,6 +477,25 @@ function pwHint(){
 }
 
 /* ================= ACCOUNT PAGE ================= */
+const JOB_NAMES={0:'Novice',1:'Swordman',2:'Mage',3:'Archer',4:'Acolyte',5:'Merchant',6:'Thief',
+ 7:'Knight',8:'Priest',9:'Wizard',10:'Blacksmith',11:'Hunter',12:'Assassin',14:'Crusader',
+ 15:'Monk',16:'Sage',17:'Rogue',18:'Alchemist',19:'Bard',20:'Dancer',23:'Super Novice',
+ 24:'Gunslinger',25:'Ninja',4001:'Novice High',4002:'Swordman High',4003:'Mage High',
+ 4004:'Archer High',4005:'Acolyte High',4006:'Merchant High',4007:'Thief High',
+ 4008:'Lord Knight',4009:'High Priest',4010:'High Wizard',4011:'Whitesmith',4012:'Sniper',
+ 4013:'Assassin Cross',4015:'Paladin',4016:'Champion',4017:'Professor',4018:'Stalker',
+ 4019:'Creator',4020:'Clown',4021:'Gypsy'};
+function jobName(c){ return JOB_NAMES[c] || ('Class '+c); }
+
+function acctTab(name, btn){
+  document.querySelectorAll('.atab').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  document.querySelectorAll('.atab-panel').forEach(function(p){ p.classList.remove('show'); });
+  var el=document.getElementById('tab-'+name);
+  if(el) el.classList.add('show');
+  try{ sessionStorage.setItem('nero_acct_tab',name); }catch(e){}
+}
+
 async function loadAccountPage(){
   var guard=document.getElementById('acct-guard');
   var content=document.getElementById('acct-content');
@@ -484,32 +503,97 @@ async function loadAccountPage(){
   if(!Auth.loggedIn){ guard.style.display=''; content.style.display='none'; return; }
   guard.style.display='none'; content.style.display='';
 
-  var d = await NeroAPI.get('me');
-  var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
-
-  if(d && d.account){
-    set('ac-user',d.account.userid); set('ac-mail',d.account.email||'—');
-    set('ac-id',d.account.account_id); set('ac-since',d.account.registered||'—');
-    set('ac-last',d.account.lastlogin||'—');
-    set('ac-state',(d.account.state==0?'Active':'Restricted'));
-  }else{
-    set('ac-user',Auth.user()); set('ac-mail','—'); set('ac-id','—');
-    set('ac-since','—'); set('ac-last','—'); set('ac-state','Demo mode');
+  /* restore the last tab the user was on */
+  var want=null;
+  try{ want=sessionStorage.getItem('nero_acct_tab'); }catch(e){}
+  if(want){
+    var b=document.querySelector('.atab[data-t="'+want+'"]');
+    if(b) acctTab(want,b);
   }
 
+  var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+  var val=function(id,v){ var e=document.getElementById(id); if(e) e.value=v; };
+
+  var d = await NeroAPI.get('me');
+  var demo = !d;
+
+  var name = (d && d.account && d.account.userid) || Auth.user() || 'Adventurer';
+  var mail = (d && d.account && d.account.email) || (demo ? 'not connected' : '—');
+
+  set('ac-avatar', name.charAt(0).toUpperCase());
+  set('ac-user', name);
+  set('ac-mail', mail);
+  val('mail-cur', mail);
+  set('ac-id', (d && d.account && d.account.account_id) || '—');
+  set('ac-last', (d && d.account && d.account.lastlogin) || '—');
+  set('ac-since', (d && d.account && d.account.registered) || '—');
+  set('ac-sex', (d && d.account && d.account.sex==='F') ? 'Female' : 'Male');
+  set('ac-group', (d && d.account && d.account.group_id > 0) ? 'Staff' : 'Player');
+
+  var stEl=document.getElementById('ac-state');
+  if(stEl){
+    var active = demo ? true : (d.account && Number(d.account.state)===0);
+    stEl.textContent = demo ? 'Demo mode' : (active ? 'Active' : 'Restricted');
+    stEl.className = 'pbadge' + (active ? '' : ' alt');
+  }
+
+  /* ---- characters ---- */
   var chars=(d&&d.characters)||[];
+  var totalZeny=0;
+  chars.forEach(function(c){ totalZeny += Number(c.zeny)||0; });
+  set('ac-nchar', demo ? '—' : chars.length);
+  set('ac-zeny',  demo ? '—' : fmtNum(totalZeny));
+
   var cb=document.querySelector('#ac-chars tbody');
-  if(cb) cb.innerHTML = chars.length
-    ? chars.map(function(c){ return '<tr><td>'+c.name+'</td><td>'+c.base_level+'</td><td>'+
-        c.job_level+'</td><td>'+fmtNum(c.zeny)+'</td><td>'+(c.guild||'—')+'</td></tr>'; }).join('')
-    : '<tr><td colspan="5" class="norow">No characters yet.</td></tr>';
+  if(cb){
+    if(chars.length){
+      cb.innerHTML=chars.map(function(c){
+        var online = Number(c.online)===1;
+        return '<tr>'+
+          '<td><b>'+c.name+'</b></td>'+
+          '<td>'+jobName(Number(c.class))+'</td>'+
+          '<td class="rank">'+c.base_level+'</td>'+
+          '<td>'+c.job_level+'</td>'+
+          '<td>'+fmtNum(c.zeny)+'</td>'+
+          '<td>'+(c.guild||'—')+'</td>'+
+          '<td><span class="pill '+(online?'on':'off')+'">'+(online?'Online':'Offline')+'</span></td>'+
+        '</tr>';
+      }).join('');
+    }else{
+      cb.innerHTML='<tr><td colspan="7" class="norow">'+
+        (demo ? 'Connect the backend to see your characters.' : 'No characters on this account yet.')+
+        '</td></tr>';
+    }
+  }
+
+  /* ---- cash point + donations ---- */
+  var cp = (d && d.account && d.account.cash_point!=null) ? fmtNum(d.account.cash_point) : (demo?'—':'0');
+  set('ac-cp', cp); set('ac-cp2', cp==='—' ? '— CP' : cp+' CP');
 
   var dons=(d&&d.donations)||[];
   var db=document.querySelector('#ac-don tbody');
-  if(db) db.innerHTML = dons.length
-    ? dons.map(function(x){ return '<tr><td>'+x.created+'</td><td>'+x.ref+'</td><td>'+
-        fmtRp(x.amount_rp)+'</td><td>'+fmtNum(x.credit_cp)+'</td><td>'+x.status+'</td></tr>'; }).join('')
-    : '<tr><td colspan="5" class="norow">No donations yet.</td></tr>';
+  if(db){
+    if(dons.length){
+      db.innerHTML=dons.map(function(x){
+        var st=(x.status||'pending').toLowerCase();
+        var cls = st==='paid' ? 'paid' : (st==='pending' ? 'pending' : 'failed');
+        var support = [x.streamer, x.guild].filter(Boolean).join(' / ') || '—';
+        return '<tr>'+
+          '<td>'+x.created+'</td>'+
+          '<td><code>'+x.ref+'</code></td>'+
+          '<td>'+fmtRp(Number(x.amount_rp))+'</td>'+
+          '<td>'+fmtNum(x.credit_cp)+'</td>'+
+          '<td>'+(Number(x.bonus_cp)>0?'+'+fmtNum(x.bonus_cp):'—')+'</td>'+
+          '<td>'+support+'</td>'+
+          '<td><span class="pill '+cls+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>'+
+        '</tr>';
+      }).join('');
+    }else{
+      db.innerHTML='<tr><td colspan="7" class="norow">'+
+        (demo ? 'Connect the backend to see your donation history.' : 'No donations yet.')+
+        '</td></tr>';
+    }
+  }
 }
 
 async function doChangePassword(){

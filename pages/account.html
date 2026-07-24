@@ -14,84 +14,135 @@
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
-<div class="wrap">
+<div class="wrap wide">
   <h1 class="pg-title">My Account</h1>
-  <p class="subtitle">Manage your NeRO game account. These are the same details you use in-game.</p>
 
-  <div id="acct-guard" class="note-login" style="max-width:520px">
-    You need to be logged in to view this page.
-    <button class="btn-gold" style="margin-top:12px" onclick="openPanel('login')">Log in</button>
+  <div id="acct-guard" class="guard-box">
+    <i class="ti ti-lock"></i>
+    <div>
+      <h3>You are not signed in</h3>
+      <p>Log in to view your characters, donations and account settings.</p>
+    </div>
+    <button class="btn-gold" style="max-width:180px" onclick="openPanel('login')">Log in</button>
   </div>
 
   <div id="acct-content" style="display:none">
-    <div class="acct-grid">
 
-      <section class="acct-card">
-        <h2><i class="ti ti-user-circle"></i> Profile</h2>
-        <div class="kv"><span>Username</span><span id="ac-user">—</span></div>
-        <div class="kv"><span>Email</span><span id="ac-mail">—</span></div>
-        <div class="kv"><span>Account ID</span><span id="ac-id">—</span></div>
-        <div class="kv"><span>Registered</span><span id="ac-since">—</span></div>
-        <div class="kv"><span>Last login</span><span id="ac-last">—</span></div>
-        <div class="kv"><span>Status</span><span id="ac-state">—</span></div>
-      </section>
-
-      <section class="acct-card">
-        <h2><i class="ti ti-lock"></i> Change password</h2>
-        <div id="pw-msg"></div>
-        <label class="fld">Current password</label>
-        <input class="inp" id="pw-old" type="password" autocomplete="current-password">
-        <label class="fld">New password</label>
-        <input class="inp" id="pw-new" type="password" autocomplete="new-password" oninput="pwHint()">
-        <ul class="pw-rules" id="pw-rules">
-          <li data-r="len"><i class="ti ti-circle"></i> 8 to 31 characters</li>
-          <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
-          <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
-          <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
-          <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
-        </ul>
-        <label class="fld">Confirm new password</label>
-        <input class="inp" id="pw-new2" type="password" autocomplete="new-password">
-        <button class="btn-gold" id="pw-btn" onclick="doChangePassword()">Update password</button>
-      </section>
-
-      <section class="acct-card">
-        <h2><i class="ti ti-mail"></i> Change email</h2>
-        <div id="mail-msg"></div>
-        <label class="fld">New email</label>
-        <input class="inp" id="mail-new" type="email" maxlength="39">
-        <label class="fld">Confirm with password</label>
-        <input class="inp" id="mail-pw" type="password" autocomplete="current-password">
-        <button class="btn-gold" id="mail-btn" onclick="doChangeEmail()">Update email</button>
-      </section>
-
-      <section class="acct-card">
-        <h2><i class="ti ti-users"></i> Characters</h2>
-        <div class="tbl-wrap">
-          <table class="stat" id="ac-chars">
-            <thead><tr><th>Name</th><th>Base</th><th>Job</th><th>Zeny</th><th>Guild</th></tr></thead>
-            <tbody><tr><td colspan="5" class="norow">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="acct-card">
-        <h2><i class="ti ti-heart"></i> Donation history</h2>
-        <div class="tbl-wrap">
-          <table class="stat" id="ac-don">
-            <thead><tr><th>Date</th><th>Reference</th><th>Amount</th><th>CP</th><th>Status</th></tr></thead>
-            <tbody><tr><td colspan="5" class="norow">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="acct-card">
-        <h2><i class="ti ti-shield-lock"></i> Security</h2>
-        <p class="subtitle" style="margin:0 0 14px">Forgot your password? Use the recovery link on the login form.</p>
-        <button class="btn-ghost" onclick="doLogout()">Log out</button>
-      </section>
-
+    <div class="acct-tabs">
+      <button class="atab on" data-t="details"  onclick="acctTab('details',this)"><i class="ti ti-user"></i> Account Details</button>
+      <button class="atab"    data-t="security" onclick="acctTab('security',this)"><i class="ti ti-lock"></i> Security</button>
+      <button class="atab"    data-t="donation" onclick="acctTab('donation',this)"><i class="ti ti-heart"></i> Donations &amp; CP</button>
     </div>
+
+    <!-- ============ TAB 1 : ACCOUNT DETAILS ============ -->
+    <section class="atab-panel show" id="tab-details">
+
+      <div class="prof-banner">
+        <div class="prof-av-lg" id="ac-avatar">A</div>
+        <div class="prof-meta">
+          <h2 id="ac-user">—</h2>
+          <p><span id="ac-mail">—</span></p>
+          <div class="prof-badges">
+            <span class="pbadge" id="ac-state">—</span>
+            <span class="pbadge alt">Account #<span id="ac-id">—</span></span>
+          </div>
+        </div>
+        <div class="prof-stats">
+          <div class="pstat"><span class="pv" id="ac-cp">—</span><span class="pl">Cash Point</span></div>
+          <div class="pstat"><span class="pv" id="ac-nchar">—</span><span class="pl">Characters</span></div>
+          <div class="pstat"><span class="pv" id="ac-zeny">—</span><span class="pl">Total Zeny</span></div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-item"><span>Last login</span><b id="ac-last">—</b></div>
+        <div class="info-item"><span>Registered</span><b id="ac-since">—</b></div>
+        <div class="info-item"><span>Gender</span><b id="ac-sex">—</b></div>
+        <div class="info-item"><span>Group</span><b id="ac-group">Player</b></div>
+      </div>
+
+      <h2 class="sec-title"><i class="ti ti-users"></i> Characters</h2>
+      <div class="tbl-wrap">
+        <table class="stat big" id="ac-chars">
+          <thead><tr>
+            <th>Character</th><th>Class</th><th>Base Lv</th><th>Job Lv</th>
+            <th>Zeny</th><th>Guild</th><th>Status</th>
+          </tr></thead>
+          <tbody><tr><td colspan="7" class="norow">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TAB 2 : SECURITY ============ -->
+    <section class="atab-panel" id="tab-security">
+      <div class="form-row">
+
+        <div class="form-card">
+          <h2><i class="ti ti-lock"></i> Change password</h2>
+          <div id="pw-msg"></div>
+          <label class="fld">Current password</label>
+          <input class="inp" id="pw-old" type="password" autocomplete="current-password">
+          <label class="fld">New password</label>
+          <input class="inp" id="pw-new" type="password" autocomplete="new-password" oninput="pwHint()">
+          <ul class="pw-rules" id="pw-rules">
+            <li data-r="len"><i class="ti ti-circle"></i> Between 8 and 31 characters</li>
+            <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
+            <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
+            <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
+            <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
+          </ul>
+          <label class="fld">Confirm new password</label>
+          <input class="inp" id="pw-new2" type="password" autocomplete="new-password">
+          <button class="btn-gold" id="pw-btn" onclick="doChangePassword()">Update password</button>
+        </div>
+
+        <div class="form-card">
+          <h2><i class="ti ti-mail"></i> Change email</h2>
+          <div id="mail-msg"></div>
+          <label class="fld">Current email</label>
+          <input class="inp" id="mail-cur" disabled>
+          <label class="fld">New email</label>
+          <input class="inp" id="mail-new" type="email" maxlength="39">
+          <label class="fld">Confirm with your password</label>
+          <input class="inp" id="mail-pw" type="password" autocomplete="current-password">
+          <button class="btn-gold" id="mail-btn" onclick="doChangeEmail()">Update email</button>
+
+          <h2 style="margin-top:28px"><i class="ti ti-logout"></i> Session</h2>
+          <p class="subtitle" style="margin:0 0 8px">Signs you out of this browser only.</p>
+          <button class="btn-ghost" onclick="doLogout()">Log out</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ TAB 3 : DONATIONS ============ -->
+    <section class="atab-panel" id="tab-donation">
+      <div class="cp-banner">
+        <div>
+          <span class="cp-label">Current balance</span>
+          <span class="cp-value" id="ac-cp2">—</span>
+        </div>
+        <button class="btn-gold" style="max-width:220px;margin:0" onclick="openPanel('donation')">
+          <i class="ti ti-plus"></i> Purchase Cash Point
+        </button>
+      </div>
+
+      <h2 class="sec-title"><i class="ti ti-receipt"></i> Donation history</h2>
+      <div class="tbl-wrap">
+        <table class="stat big" id="ac-don">
+          <thead><tr>
+            <th>Date</th><th>Reference</th><th>Amount</th>
+            <th>CP credited</th><th>Bonus</th><th>Supported</th><th>Status</th>
+          </tr></thead>
+          <tbody><tr><td colspan="7" class="norow">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="subtitle" style="margin-top:14px">
+        Cash Points are credited once payment is confirmed. Pending items usually
+        clear within a few minutes.
+      </p>
+    </section>
+
   </div>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
