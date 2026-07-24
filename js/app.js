@@ -5,6 +5,43 @@ const ROOT = (function(){
   return new URL(rel||'./', location.href).href;
 })();
 
+/* ================= PASSWORD POLICY ================= */
+const PW_RULES = {
+  len:   function(pw){ return pw.length>=8 && pw.length<=31; },
+  upper: function(pw){ return /[A-Z]/.test(pw); },
+  lower: function(pw){ return /[a-z]/.test(pw); },
+  digit: function(pw){ return /[0-9]/.test(pw); },
+  name:  function(pw,user){ return !user || pw.toLowerCase().indexOf(user.toLowerCase())===-1; }
+};
+const PW_TEXT = {
+  len:  'Your password must be between 8 and 31 characters.',
+  upper:'Your password must contain at least 1 uppercase letter.',
+  lower:'Your password must contain at least 1 lowercase letter.',
+  digit:'Your password must contain at least 1 number.',
+  name: 'Your password cannot contain your username.'
+};
+function pwCheck(pw,user){
+  var out={};
+  for(var k in PW_RULES){ out[k]= k==='name' ? PW_RULES[k](pw,user) : PW_RULES[k](pw); }
+  return out;
+}
+function pwFirstError(pw,user){
+  var r=pwCheck(pw,user);
+  for(var k in r){ if(!r[k]) return PW_TEXT[k]; }
+  return null;
+}
+function pwPaintRules(listId,pw,user){
+  var ul=document.getElementById(listId); if(!ul) return;
+  var r=pwCheck(pw,user);
+  ul.querySelectorAll('li').forEach(function(li){
+    var k=li.getAttribute('data-r'); if(!(k in r)) return;
+    var ok=r[k];
+    li.classList.toggle('pass', ok && pw.length>0);
+    li.classList.toggle('fail', !ok && pw.length>0);
+    li.querySelector('i').className = 'ti ' + (pw.length===0 ? 'ti-circle' : (ok?'ti-circle-check':'ti-circle-x'));
+  });
+}
+
 /* ================= ACCOUNT CHIP ================= */
 function initials(n){ return (n||'A').trim().charAt(0).toUpperCase(); }
 function renderAcct(){
@@ -69,26 +106,44 @@ function loginHTML(){ return `
   <p class="lead">Sign in to your NeRO account to donate, trade, and track your progress.</p>
   <label class="fld">Account ID</label><input class="inp" id="login-id" placeholder="yourname">
   <label class="fld">Password</label><input class="inp" id="login-pw" type="password" placeholder="••••••••">
-  <button class="btn-gold" onclick="doLogin()">Login</button>
+  <button class="btn-gold" id="login-btn" onclick="doLogin()">Login</button>
   <div class="rowlinks"><a href="#" onclick="return false">Forgot password?</a>
   <a href="#" onclick="openPanel('register');return false">Register</a></div>`;
 }
-function doLogin(){
-  var id=(document.getElementById('login-id').value||'').trim()||'Adventurer';
-  Auth.loggedIn=true; Auth.setUser(id); renderAcct(); openPanel('account');
+async function doLogin(){
+  var id=(document.getElementById('login-id').value||'').trim();
+  var pw=document.getElementById('login-pw').value||'';
+  if(!NeroAPI.enabled()){                      /* demo mode until backend is live */
+    Auth.loggedIn=true; Auth.setUser(id||'Adventurer'); renderAcct(); openPanel('account'); return;
+  }
+  if(!id||!pw) return panelMsg('login-msg','Enter your username and password.',false);
+  var b=document.getElementById('login-btn'); b.disabled=true; b.textContent='Signing in...';
+  var res=await NeroAPI.post('/account.php',{action:'login',userid:id,password:pw});
+  b.disabled=false; b.textContent='Login';
+  if(res&&res.ok){ Auth.loggedIn=true; Auth.setUser(res.data.userid); renderAcct(); openPanel('account'); }
+  else panelMsg('login-msg',(res&&res.error)||'Could not sign in.',false);
 }
 function registerHTML(){
   return `
     <p class="lead">Create your NeRO game account. This is the same account you use in-game.</p>
     <div id="reg-msg"></div>
     <label class="fld">Username</label>
-    <input class="inp" id="reg-id" placeholder="4-23 letters or numbers" maxlength="23" autocomplete="username">
+    <input class="inp" id="reg-id" placeholder="4-23 letters or numbers" maxlength="23"
+           autocomplete="username" oninput="regPwHint()">
     <label class="fld">Email</label>
     <input class="inp" id="reg-mail" type="email" placeholder="name@email.com" maxlength="39">
     <label class="fld">Password</label>
-    <input class="inp" id="reg-pw" type="password" placeholder="at least 6 characters" maxlength="32" autocomplete="new-password">
+    <input class="inp" id="reg-pw" type="password" placeholder="8-31 characters" maxlength="31"
+           autocomplete="new-password" oninput="regPwHint()">
+    <ul class="pw-rules" id="reg-rules">
+      <li data-r="len"><i class="ti ti-circle"></i> 8 to 31 characters</li>
+      <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
+      <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
+      <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
+      <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
+    </ul>
     <label class="fld">Confirm password</label>
-    <input class="inp" id="reg-pw2" type="password" placeholder="repeat password" maxlength="32" autocomplete="new-password">
+    <input class="inp" id="reg-pw2" type="password" placeholder="repeat password" maxlength="31" autocomplete="new-password">
     <label class="fld">Gender</label>
     <select class="inp" id="reg-sex"><option value="M">Male</option><option value="F">Female</option></select>
     <button class="btn-gold" id="reg-btn" onclick="doRegister()">Create Account</button>
@@ -109,7 +164,8 @@ async function doRegister(){
 
   if(id.length<4)  return panelMsg('reg-msg','Username must be at least 4 characters.',false);
   if(!/^[A-Za-z0-9_]+$/.test(id)) return panelMsg('reg-msg','Username can only use letters, numbers and underscore.',false);
-  if(pw.length<6)  return panelMsg('reg-msg','Password must be at least 6 characters.',false);
+  var pwErr=pwFirstError(pw,id);
+  if(pwErr)        return panelMsg('reg-msg',pwErr,false);
   if(pw!==pw2)     return panelMsg('reg-msg','Passwords do not match.',false);
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return panelMsg('reg-msg','Please enter a valid email.',false);
 
@@ -137,11 +193,16 @@ function accountHTML(){
   <div class="kv"><span>Guild</span><span>Valhalla</span></div>
   <div class="kv"><span>Status</span><span style="color:#46d17f">Online</span></div>
   <button class="btn-gold" onclick="openPanel('donation')">Donate / Top Up</button>
+  <a class="btn-ghost" href="${ROOT}pages/account.html">Manage Account</a>
   <a class="btn-ghost" href="${ROOT}pages/marketplace.html">My Marketplace Listings</a>
   <button class="btn-ghost" onclick="doLogout()">Log Out</button>
   <p class="lead" style="margin-top:16px;font-size:12px">Profile data is placeholder until the backend is connected.</p>`;
 }
-function doLogout(){ Auth.logout(); renderAcct(); closePanel(); }
+async function doLogout(){
+  if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }
+  Auth.logout(); renderAcct(); closePanel();
+  if(location.pathname.indexOf('account.html')>-1) location.href=ROOT;
+}
 
 /* ---- Download ---- */
 function downloadHTML(){ return `
@@ -409,6 +470,83 @@ function wikiSearch(){
   }).join('');
 }
 
+function regPwHint(){
+  var pw=(document.getElementById('reg-pw')||{}).value||'';
+  var id=(document.getElementById('reg-id')||{}).value||'';
+  pwPaintRules('reg-rules',pw,id);
+}
+function pwHint(){
+  var pw=(document.getElementById('pw-new')||{}).value||'';
+  pwPaintRules('pw-rules',pw,Auth.user());
+}
+
+/* ================= ACCOUNT PAGE ================= */
+async function loadAccountPage(){
+  var guard=document.getElementById('acct-guard');
+  var content=document.getElementById('acct-content');
+  if(!guard||!content) return;
+  if(!Auth.loggedIn){ guard.style.display=''; content.style.display='none'; return; }
+  guard.style.display='none'; content.style.display='';
+
+  var d = await NeroAPI.get('me');
+  var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+
+  if(d && d.account){
+    set('ac-user',d.account.userid); set('ac-mail',d.account.email||'—');
+    set('ac-id',d.account.account_id); set('ac-since',d.account.registered||'—');
+    set('ac-last',d.account.lastlogin||'—');
+    set('ac-state',(d.account.state==0?'Active':'Restricted'));
+  }else{
+    set('ac-user',Auth.user()); set('ac-mail','—'); set('ac-id','—');
+    set('ac-since','—'); set('ac-last','—'); set('ac-state','Demo mode');
+  }
+
+  var chars=(d&&d.characters)||[];
+  var cb=document.querySelector('#ac-chars tbody');
+  if(cb) cb.innerHTML = chars.length
+    ? chars.map(function(c){ return '<tr><td>'+c.name+'</td><td>'+c.base_level+'</td><td>'+
+        c.job_level+'</td><td>'+fmtNum(c.zeny)+'</td><td>'+(c.guild||'—')+'</td></tr>'; }).join('')
+    : '<tr><td colspan="5" class="norow">No characters yet.</td></tr>';
+
+  var dons=(d&&d.donations)||[];
+  var db=document.querySelector('#ac-don tbody');
+  if(db) db.innerHTML = dons.length
+    ? dons.map(function(x){ return '<tr><td>'+x.created+'</td><td>'+x.ref+'</td><td>'+
+        fmtRp(x.amount_rp)+'</td><td>'+fmtNum(x.credit_cp)+'</td><td>'+x.status+'</td></tr>'; }).join('')
+    : '<tr><td colspan="5" class="norow">No donations yet.</td></tr>';
+}
+
+async function doChangePassword(){
+  var oldpw=(document.getElementById('pw-old')||{}).value||'';
+  var np=(document.getElementById('pw-new')||{}).value||'';
+  var np2=(document.getElementById('pw-new2')||{}).value||'';
+  if(!oldpw) return panelMsg('pw-msg','Enter your current password.',false);
+  var err=pwFirstError(np,Auth.user());
+  if(err)  return panelMsg('pw-msg',err,false);
+  if(np!==np2) return panelMsg('pw-msg','New passwords do not match.',false);
+
+  var b=document.getElementById('pw-btn'); b.disabled=true; b.textContent='Updating...';
+  var res=await NeroAPI.post('/account.php',{action:'changepw',current:oldpw,password:np});
+  b.disabled=false; b.textContent='Update password';
+  if(res&&res.ok){
+    panelMsg('pw-msg','Password updated.',true);
+    ['pw-old','pw-new','pw-new2'].forEach(function(i){ document.getElementById(i).value=''; });
+    pwHint();
+  }else panelMsg('pw-msg',(res&&res.error)||'Could not update the password.',false);
+}
+
+async function doChangeEmail(){
+  var mail=(document.getElementById('mail-new')||{}).value.trim();
+  var pw=(document.getElementById('mail-pw')||{}).value||'';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return panelMsg('mail-msg','Enter a valid email.',false);
+  if(!pw) return panelMsg('mail-msg','Confirm with your password.',false);
+  var b=document.getElementById('mail-btn'); b.disabled=true; b.textContent='Updating...';
+  var res=await NeroAPI.post('/account.php',{action:'changeemail',email:mail,current:pw});
+  b.disabled=false; b.textContent='Update email';
+  if(res&&res.ok){ panelMsg('mail-msg','Email updated.',true); loadAccountPage(); }
+  else panelMsg('mail-msg',(res&&res.error)||'Could not update the email.',false);
+}
+
 /* ================= LIVE STAT TABLES ================= */
 function tdRow(cells){
   return '<tr>'+cells.map(function(c,i){
@@ -457,6 +595,7 @@ function afterPageLoad(){
   curF='all';                       /* reset marketplace filter state */
   selAmt=null;
   hydrateTable();                   /* pull live rows if the API is on */
+  loadAccountPage();                /* account page, if we're on it */
 }
 
 (function router(){
