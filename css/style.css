@@ -12,7 +12,7 @@ body.page .sitehead,body.page .wrap,body.page .wiki-layout,body.page .wk-toggle{
 .stage-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .stage{position:relative;width:100vw;height:100vh}
 .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pin{position:absolute;background:none;border:none;cursor:pointer;padding:0;z-index:4;transform:translate(-50%,-50%)}
+.pin{position:absolute;background:none;border:none;cursor:pointer;padding:0;z-index:9;transform:translate(-50%,-50%)}
 .pin .bob{display:block;animation:bob 5s ease-in-out infinite}
 .pin img{width:100%;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55));transition:filter .25s;animation:sway 6.8s ease-in-out infinite;transform-origin:50% 88%}
 .pin:hover img{filter:drop-shadow(0 0 12px rgba(228,184,75,.95)) brightness(1.12)}
@@ -55,7 +55,8 @@ body.page .sitehead{position:sticky;top:0;z-index:9;background:rgba(7,11,18,.86)
 .btn-login:hover{background:var(--gold);color:#1a1206}
 
 /* ================= HOME BAR (landing only) ================= */
-.homebar{position:absolute;top:0;left:0;right:0;z-index:8;display:flex;align-items:center;gap:16px;padding:14px 26px}
+.homebar{position:absolute;top:0;left:0;right:0;z-index:8;display:flex;align-items:center;gap:16px;padding:14px 26px;pointer-events:none}
+.homebar > *{pointer-events:auto}
 .homebar .hd-acct{margin-left:auto}
 
 /* ================= PAGE BACKGROUND ================= */
@@ -355,10 +356,10 @@ table.stat tr:hover td{background:rgba(255,255,255,.06)}
 }
 
 /* ================= BIG HOME LOGO + RIGHT CLUSTER ================= */
-.hd-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.hd-right{margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;z-index:10}
 .sitehead .hd-tabs{margin-left:auto}
 .sitehead .hd-right{margin-left:16px}
-.home-logo{height:150px !important}
+.home-logo{height:150px !important;position:relative;z-index:10}
 .homebar{align-items:flex-start;padding-top:18px}
 .homebar .hd-right{margin-top:16px}
 
