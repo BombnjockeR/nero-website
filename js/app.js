@@ -347,10 +347,10 @@ refreshOnline();
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
 var MUS={idx:0,playing:false,want:true};   /* want = user intent, survives autoplay blocking */
-var DEFAULT_VOL=0.25;                      /* 25% */
+var DEFAULT_VOL=0.15;                      /* fixed 15% — no user control */
 
 function musSave(){ try{
-  sessionStorage.setItem('nero_mus',JSON.stringify({i:MUS.idx,t:bgm.currentTime,v:bgm.volume,w:MUS.want}));
+  sessionStorage.setItem('nero_mus',JSON.stringify({i:MUS.idx,t:bgm.currentTime,w:MUS.want}));
 }catch(e){} }
 function musLoad(){ try{ return JSON.parse(sessionStorage.getItem('nero_mus')||'null'); }catch(e){ return null; } }
 function musIcon(){
@@ -366,6 +366,7 @@ function musLoadTrack(i,autoplay,seek){
   if(!TRACKS.length) return;
   MUS.idx=(i+TRACKS.length)%TRACKS.length;
   bgm.src=ROOT+TRACKS[MUS.idx].file;
+  bgm.volume=DEFAULT_VOL;
   if(seek){ try{ bgm.currentTime=seek; }catch(e){} }
   musLabel();
   if(autoplay) musPlay();
@@ -396,13 +397,8 @@ function musBuildList(){
 (function initMusic(){
   if(!bgm) return;
   var saved=musLoad();
-  var vol = (saved && typeof saved.v==='number') ? saved.v : DEFAULT_VOL;
-  bgm.volume=vol;
+  bgm.volume=DEFAULT_VOL;                      /* always 15%, not adjustable */
   MUS.want = saved ? saved.w!==false : true;   /* on by default */
-
-  var volEl=document.getElementById('mus-vol');
-  if(volEl){ volEl.value=Math.round(vol*100);
-    volEl.addEventListener('input',function(){ bgm.volume=this.value/100; musSave(); }); }
 
   musBuildList();
   musLoadTrack(saved?saved.i:0,false,saved?saved.t:0);
