@@ -8,6 +8,22 @@ const API_BASE = "";
 
 const NeroAPI = {
   enabled(){ return typeof API_BASE === "string" && API_BASE.length > 0; },
+  async post(path, body){
+    if(!this.enabled()) return {ok:false, error:"Backend not connected yet (demo mode)"};
+    try{
+      const ctl=new AbortController();
+      const t=setTimeout(()=>ctl.abort(), 12000);
+      const r=await fetch(API_BASE+path,{
+        method:"POST", signal:ctl.signal, credentials:"omit",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body)
+      });
+      clearTimeout(t);
+      const j=await r.json().catch(()=>null);
+      if(!j) return {ok:false, error:"Server did not respond properly"};
+      return j;
+    }catch(e){ return {ok:false, error:"Could not reach the server"}; }
+  },
   async get(type){
     if(!this.enabled()) return null;
     try{

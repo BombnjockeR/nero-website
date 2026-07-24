@@ -77,15 +77,56 @@ function doLogin(){
   var id=(document.getElementById('login-id').value||'').trim()||'Adventurer';
   Auth.loggedIn=true; Auth.setUser(id); renderAcct(); openPanel('account');
 }
-function registerHTML(){ return `
-  <p class="lead">Create a new NeRO account. It's free.</p>
-  <label class="fld">Account ID</label><input class="inp" placeholder="choose an ID">
-  <label class="fld">Email</label><input class="inp" type="email" placeholder="name@email.com">
-  <label class="fld">Password</label><input class="inp" type="password" placeholder="••••••••">
-  <label class="fld">Confirm Password</label><input class="inp" type="password" placeholder="••••••••">
-  <button class="btn-gold" onclick="alert('Registration needs the backend (demo)')">Create Account</button>
-  <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
+function registerHTML(){
+  return `
+    <p class="lead">Create your NeRO game account. This is the same account you use in-game.</p>
+    <div id="reg-msg"></div>
+    <label class="fld">Username</label>
+    <input class="inp" id="reg-id" placeholder="4-23 letters or numbers" maxlength="23" autocomplete="username">
+    <label class="fld">Email</label>
+    <input class="inp" id="reg-mail" type="email" placeholder="name@email.com" maxlength="39">
+    <label class="fld">Password</label>
+    <input class="inp" id="reg-pw" type="password" placeholder="at least 6 characters" maxlength="32" autocomplete="new-password">
+    <label class="fld">Confirm password</label>
+    <input class="inp" id="reg-pw2" type="password" placeholder="repeat password" maxlength="32" autocomplete="new-password">
+    <label class="fld">Gender</label>
+    <select class="inp" id="reg-sex"><option value="M">Male</option><option value="F">Female</option></select>
+    <button class="btn-gold" id="reg-btn" onclick="doRegister()">Create Account</button>
+    <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
 }
+function panelMsg(id,text,ok){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML='<div class="note-login" style="'+
+    (ok?'background:rgba(70,209,127,.12);border-color:rgba(70,209,127,.5);color:#8ce0b4'
+       :'background:rgba(226,75,74,.12);border-color:rgba(226,75,74,.5);color:#f0a3a3')+'">'+text+'</div>';
+}
+async function doRegister(){
+  var id=(document.getElementById('reg-id').value||'').trim();
+  var mail=(document.getElementById('reg-mail').value||'').trim();
+  var pw=document.getElementById('reg-pw').value||'';
+  var pw2=document.getElementById('reg-pw2').value||'';
+  var sex=document.getElementById('reg-sex').value||'M';
+
+  if(id.length<4)  return panelMsg('reg-msg','Username must be at least 4 characters.',false);
+  if(!/^[A-Za-z0-9_]+$/.test(id)) return panelMsg('reg-msg','Username can only use letters, numbers and underscore.',false);
+  if(pw.length<6)  return panelMsg('reg-msg','Password must be at least 6 characters.',false);
+  if(pw!==pw2)     return panelMsg('reg-msg','Passwords do not match.',false);
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return panelMsg('reg-msg','Please enter a valid email.',false);
+
+  var btn=document.getElementById('reg-btn');
+  btn.disabled=true; btn.textContent='Creating...';
+  var res=await NeroAPI.post('/account.php',
+    {action:'register', userid:id, password:pw, email:mail, sex:sex});
+  btn.disabled=false; btn.textContent='Create Account';
+
+  if(res && res.ok){
+    panelMsg('reg-msg','Account created. You can log in now.',true);
+    setTimeout(function(){ openPanel('login'); },1400);
+  }else{
+    panelMsg('reg-msg',(res && res.error) || 'Could not create the account.',false);
+  }
+}
+
 function accountHTML(){
   var n=Auth.user()||'Adventurer';
   return `
@@ -149,7 +190,8 @@ function donationHTML(){
   <select class="inp" id="don-guild" onchange="updateSummary()"><option value="">— None —</option>${gd}</select>
   <div class="hintline">Support your guild leader by mentioning your guild.</div>
   <div class="summary" id="don-summary">Select an amount to see your total.</div>
-  <button class="btn-gold" onclick="alert('Payment gateway needs the backend (demo)')">Proceed to Payment</button>`;
+  <div id="don-msg"></div>
+  <button class="btn-gold" id="don-btn" onclick="doDonate()">Proceed to Payment</button>`;
 }
 function pickAmt(i){ selAmt=i;
   document.querySelectorAll('.amt').forEach(function(e){e.classList.toggle('sel',+e.dataset.i===i);});
@@ -167,6 +209,25 @@ function updateSummary(){
     (guild?'Guild: <b>'+guild+'</b><br>':'')+
     '<hr style="border:none;border-top:1px solid rgba(228,184,75,.3);margin:8px 0">'+
     'You receive: <b>'+fmtNum(cp+bonus)+' CP</b><br>You pay: <b>'+fmtRp(cp)+'</b>';
+}
+
+async function doDonate(){
+  if(selAmt===null) return panelMsg('don-msg','Please choose an amount first.',false);
+  var amount=DONATE_AMOUNTS[selAmt].cp;
+  var streamer=document.getElementById('don-streamer').value;
+  var guild=document.getElementById('don-guild').value;
+
+  var btn=document.getElementById('don-btn');
+  btn.disabled=true; btn.textContent='Preparing...';
+  var res=await NeroAPI.post('/donate.php',
+    {userid:Auth.user(), amount:amount, streamer:streamer, guild:guild});
+  btn.disabled=false; btn.textContent='Proceed to Payment';
+
+  if(res && res.ok && res.data && res.data.pay_url){
+    window.location.href=res.data.pay_url;      /* hand off to the gateway */
+  }else{
+    panelMsg('don-msg',(res && res.error) || 'Payment is not connected yet.',false);
+  }
 }
 
 /* ================= TABLE / GRID SEARCH ================= */
