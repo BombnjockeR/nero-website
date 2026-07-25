@@ -431,6 +431,15 @@ function musBuildList(){
   musIcon();
 })();
 
+/* ================= WIKI DRAWER (mobile) ================= */
+function wikiNav(open){
+  var side=document.getElementById('wiki-side');
+  var scrim=document.getElementById('wk-scrim');
+  if(!side) return;
+  if(open){ side.classList.add('open'); if(scrim) scrim.classList.add('show'); document.body.style.overflow='hidden'; }
+  else    { side.classList.remove('open'); if(scrim) scrim.classList.remove('show'); document.body.style.overflow=''; }
+}
+
 /* ================= WIKI SEARCH ================= */
 function esc(t){ return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 function wikiSearch(){
@@ -670,8 +679,7 @@ function afterPageLoad(){
   renderAcct();
   paintOnline();
   /* mobile: close the wiki contents drawer after navigating */
-  var side=document.querySelector('.wiki-side');
-  if(side) side.classList.remove('open');
+  wikiNav(false);
   curF='all';                       /* reset marketplace filter state */
   selAmt=null;
   hydrateTable();                   /* pull live rows if the API is on */
@@ -726,6 +734,7 @@ function afterPageLoad(){
     if(samePage(url.href,location.href)){ e.preventDefault(); return; }
     e.preventDefault();
     closePanel();
+    wikiNav(false);
     swap(url.href,true);
   });
 
