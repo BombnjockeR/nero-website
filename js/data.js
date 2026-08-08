@@ -57,7 +57,7 @@ const TRACKS = [
 ];
 
 /* Discord invite — replace with your real server invite link */
-const DISCORD_URL = "https://discord.gg/ArSFSrR7du";
+const DISCORD_URL = "https://discord.gg/newera-ro";
 const DOWNLOAD_URL = "https://drive.google.com/drive/folders/1ST05UgDOSsT2Zvr3D8NG9hsgrxnw_8_r?usp=drive_link";
 
 /* Session auth (demo only) */

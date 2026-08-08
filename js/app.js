@@ -186,8 +186,7 @@ async function doLogout(){
 /* ---- Download ---- */
 function downloadHTML(){ return `
   <p class="lead">Download the NeRO game client and patcher to begin your adventure.</p>
-  <div class="kv"><span>Client size</span><span>~3.5 GB</span></div>
-  <div class="kv"><span>Patch</span><span>Auto (on launch)</span></div>
+  <div class="kv"><span>Client size</span><span>TBC</span></div>
   <div class="kv"><span>OS</span><span>Windows 10 / 11</span></div>
   <a class="btn-gold" href="${DOWNLOAD_URL}" target="_blank" rel="noopener">Download Full Client</a>`;
 }
