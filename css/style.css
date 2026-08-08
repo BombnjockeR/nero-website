@@ -509,3 +509,21 @@ table.stat.big td{padding:15px 18px}
   .home-logo{height:78px !important}
   .hd-online .lbl{display:none}
 }
+
+
+/* ================= COMING SOON ================= */
+.soon-box{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:14px;padding:90px 24px;min-height:50vh}
+.soon-box i{font-size:52px;color:var(--gold);opacity:.9}
+.soon-box h2{font-size:26px;color:#fff;font-weight:600;letter-spacing:.3px}
+.soon-box p{font-size:14.5px;color:var(--muted);max-width:420px;line-height:1.6}
+.soon-box .btn-ghost{max-width:200px;margin-top:8px}
+
+.soon-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;padding:50px 10px 30px}
+.soon-panel i{font-size:40px;color:var(--gold);opacity:.9}
+.soon-panel h3{font-size:18px;color:#fff;font-weight:600}
+.soon-panel p{font-size:13.5px;color:var(--muted);line-height:1.6;max-width:300px}
+
+.hd-online.soon{opacity:.85}
+.hd-online.soon .dot{background:var(--gold);animation:none;box-shadow:0 0 6px rgba(228,184,75,.7)}

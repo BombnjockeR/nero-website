@@ -10,71 +10,16 @@
   <img class="hd-logo" src="../assets/logo.png" alt="Home" title="Home" onclick="location.href='../'">
   <nav class="hd-tabs"><a class="tab" href="../wiki/index.html">Wiki</a><a class="tab" href="../pages/stat-woe.html">WoE</a><a class="tab" href="../pages/stat-pvp.html">PvP</a><a class="tab" href="../pages/stat-mvp.html">MVP</a><a class="tab" href="../pages/stat-zeny.html">Zeny</a><a class="tab on" href="../pages/marketplace.html">Market</a></nav>
   <div class="hd-right">
-    <div class="hd-online"><span class="dot"></span><span class="num" id="online-num">0</span><span class="lbl">online</span></div>
+    <div class="hd-online soon"><span class="dot"></span><span class="lbl">Coming Soon</span></div>
     <div class="hd-acct" id="hd-acct"></div>
   </div>
 </header>
 <div class="wrap">
-  <div class="mkt-banner"><i class="ti ti-scale"></i><div>
-    <h2>NeRO Marketplace</h2><p>Player-to-player trading. Prices shown in Rupiah (Rp).</p></div></div>
-  <div class="mkt-tools">
-    <div class="searchbar flex1"><i class="ti ti-search"></i>
-      <input id="mkt-q" placeholder="Search item or seller..." oninput="filterItems()"></div>
-    <div class="toggle">
-      <button class="on" onclick="setFilter('all',this)">All</button>
-      <button onclick="setFilter('sell',this)">Selling</button>
-      <button onclick="setFilter('buy',this)">Buying</button>
-    </div>
+  <div class="soon-box"><i class="ti ti-clock-hour-4"></i>
+    <h2>Marketplace — Coming Soon</h2>
+    <p>We're still putting the finishing touches on this page. Check back soon!</p>
+    <a class="btn-ghost" href="../">Back to Home</a>
   </div>
-  <div class="grid" id="mkt-grid"><div class="card-item" data-type="sell" data-name="elemental sword [3] asuralive">
-          <div class="thumb"><i class="ti ti-sword"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Elemental Sword [3]</div>
-          <div class="meta">+9 · Fire · by <b>AsuraLive</b></div>
-          <div class="price">Rp 350.000</div></div></div><div class="card-item" data-type="sell" data-name="valkyrie armor [1] merchantmei">
-          <div class="thumb"><i class="ti ti-shield"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Valkyrie Armor [1]</div>
-          <div class="meta">+7 · by <b>MerchantMei</b></div>
-          <div class="price">Rp 220.000</div></div></div><div class="card-item" data-type="buy" data-name="tao gunka card goldhoarder">
-          <div class="thumb"><i class="ti ti-cards"></i></div>
-          <div class="info"><span class="badge buy">Buying</span><div class="nm">Tao Gunka Card</div>
-          <div class="meta">LF: 1 · by <b>GoldHoarder</b></div>
-          <div class="price">Rp 1.200.000</div></div></div><div class="card-item" data-type="sell" data-name="sniping suit [1] braninro">
-          <div class="thumb"><i class="ti ti-shirt"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Sniping Suit [1]</div>
-          <div class="meta">+8 · by <b>BraninRO</b></div>
-          <div class="price">Rp 180.000</div></div></div><div class="card-item" data-type="sell" data-name="diablos ring [1] zenyqueen">
-          <div class="thumb"><i class="ti ti-diamond"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Diablos Ring [1]</div>
-          <div class="meta">x2 · by <b>ZenyQueen</b></div>
-          <div class="price">Rp 90.000</div></div></div><div class="card-item" data-type="buy" data-name="orleans's glove [1] poringtv">
-          <div class="thumb"><i class="ti ti-hand-stop"></i></div>
-          <div class="info"><span class="badge buy">Buying</span><div class="nm">Orleans's Glove [1]</div>
-          <div class="meta">LF: 2 · by <b>PoringTV</b></div>
-          <div class="price">Rp 65.000</div></div></div><div class="card-item" data-type="sell" data-name="bloody dead branch tycoontom">
-          <div class="thumb"><i class="ti ti-plant"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Bloody Dead Branch</div>
-          <div class="meta">x10 · by <b>TycoonTom</b></div>
-          <div class="price">Rp 500.000</div></div></div><div class="card-item" data-type="sell" data-name="nero shadow orb midgardmaster">
-          <div class="thumb"><i class="ti ti-circle-dot"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Nero Shadow Orb</div>
-          <div class="meta">x50 · by <b>MidgardMaster</b></div>
-          <div class="price">Rp 120.000</div></div></div><div class="card-item" data-type="buy" data-name="costume: angel wing valkyrievods">
-          <div class="thumb"><i class="ti ti-feather"></i></div>
-          <div class="info"><span class="badge buy">Buying</span><div class="nm">Costume: Angel Wing</div>
-          <div class="meta">LF: 1 · by <b>ValkyrieVODs</b></div>
-          <div class="price">Rp 300.000</div></div></div><div class="card-item" data-type="sell" data-name="+10 physical shadow set coincollector">
-          <div class="thumb"><i class="ti ti-armchair"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">+10 Physical Shadow Set</div>
-          <div class="meta">full set · by <b>CoinCollector</b></div>
-          <div class="price">Rp 800.000</div></div></div><div class="card-item" data-type="sell" data-name="fricco's shoes [1] merchantmei">
-          <div class="thumb"><i class="ti ti-shoe"></i></div>
-          <div class="info"><span class="badge sell">Selling</span><div class="nm">Fricco's Shoes [1]</div>
-          <div class="meta">+7 · by <b>MerchantMei</b></div>
-          <div class="price">Rp 140.000</div></div></div><div class="card-item" data-type="buy" data-name="gloom under night card asuralive">
-          <div class="thumb"><i class="ti ti-cards"></i></div>
-          <div class="info"><span class="badge buy">Buying</span><div class="nm">Gloom Under Night Card</div>
-          <div class="meta">LF: 1 · by <b>AsuraLive</b></div>
-          <div class="price">Rp 950.000</div></div></div></div>
 </div>
 <div class="backdrop" id="backdrop" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
