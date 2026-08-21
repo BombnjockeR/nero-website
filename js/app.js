@@ -101,15 +101,15 @@ function render(t){
   return '';
 }
 
-function soonPanelHTML(msg){
-  return `<div class="soon-panel"><i class="ti ti-clock-hour-4"></i>
-    <h3>Coming Soon</h3>
-    <p>${msg}</p></div>`;
-}
-
 /* ---- Login / Register / Account ---- */
-function loginHTML(){
-  return soonPanelHTML("Account login and registration are being finished up. Check back soon!");
+function loginHTML(){ return `
+  <p class="lead">Sign in to your NeRO account to donate, trade, and track your progress.</p>
+  <div id="login-msg"></div>
+  <label class="fld">Account ID</label><input class="inp" id="login-id" placeholder="yourname">
+  <label class="fld">Password</label><input class="inp" id="login-pw" type="password" placeholder="••••••••">
+  <button class="btn-gold" id="login-btn" onclick="doLogin()">Login</button>
+  <div class="rowlinks"><a href="#" onclick="return false">Forgot password?</a>
+  <a href="#" onclick="openPanel('register');return false">Register</a></div>`;
 }
 async function doLogin(){
   var id=(document.getElementById('login-id').value||'').trim();
@@ -121,11 +121,37 @@ async function doLogin(){
   var b=document.getElementById('login-btn'); b.disabled=true; b.textContent='Signing in...';
   var res=await NeroAPI.post('/account.php',{action:'login',userid:id,password:pw});
   b.disabled=false; b.textContent='Login';
-  if(res&&res.ok){ Auth.loggedIn=true; Auth.setUser(res.data.userid); renderAcct(); openPanel('account'); }
+  if(res&&res.ok){
+    Auth.loggedIn=true; Auth.setUser(res.data.userid); Auth.setToken(res.data.token||'');
+    renderAcct(); openPanel('account');
+  }
   else panelMsg('login-msg',(res&&res.error)||'Could not sign in.',false);
 }
 function registerHTML(){
-  return soonPanelHTML("Account registration is being finished up. Check back soon!");
+  return `
+    <p class="lead">Create your NeRO game account. This is the same account you use in-game.</p>
+    <div id="reg-msg"></div>
+    <label class="fld">Username</label>
+    <input class="inp" id="reg-id" placeholder="4-23 letters or numbers" maxlength="23"
+           autocomplete="username" oninput="regPwHint()">
+    <label class="fld">Email</label>
+    <input class="inp" id="reg-mail" type="email" placeholder="name@email.com" maxlength="39">
+    <label class="fld">Password</label>
+    <input class="inp" id="reg-pw" type="password" placeholder="8-31 characters" maxlength="31"
+           autocomplete="new-password" oninput="regPwHint()">
+    <ul class="pw-rules" id="reg-rules">
+      <li data-r="len"><i class="ti ti-circle"></i> 8 to 31 characters</li>
+      <li data-r="upper"><i class="ti ti-circle"></i> At least 1 uppercase letter</li>
+      <li data-r="lower"><i class="ti ti-circle"></i> At least 1 lowercase letter</li>
+      <li data-r="digit"><i class="ti ti-circle"></i> At least 1 number</li>
+      <li data-r="name"><i class="ti ti-circle"></i> Cannot contain your username</li>
+    </ul>
+    <label class="fld">Confirm password</label>
+    <input class="inp" id="reg-pw2" type="password" placeholder="repeat password" maxlength="31" autocomplete="new-password">
+    <label class="fld">Gender</label>
+    <select class="inp" id="reg-sex"><option value="M">Male</option><option value="F">Female</option></select>
+    <button class="btn-gold" id="reg-btn" onclick="doRegister()">Create Account</button>
+    <div class="rowlinks"><span></span><a href="#" onclick="openPanel('login');return false">Already have an account?</a></div>`;
 }
 
 function panelMsg(id,text,ok){
@@ -179,7 +205,8 @@ function accountHTML(){
 }
 async function doLogout(){
   if(NeroAPI.enabled()){ await NeroAPI.post('/account.php',{action:'logout'}); }
-  Auth.logout(); renderAcct(); closePanel();
+  Auth.logout(); Auth.setToken('');
+  renderAcct(); closePanel();
   if(location.pathname.indexOf('account.html')>-1) location.href=ROOT;
 }
 
@@ -213,7 +240,23 @@ function serverHTML(){ var s=SERVER_INFO; return `
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
 function donationHTML(){
-  return soonPanelHTML("Donations and Cash Point top-ups are being finished up. Check back soon!");
+  var amts=DONATE_AMOUNTS.map(function(a,i){
+    return '<div class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+
+      '<div class="cp">'+fmtNum(a.cp)+' CP</div><div class="lbl">'+fmtRp(a.cp)+'</div></div>';}).join('');
+  var st=STREAMERS.map(function(s){return '<option>'+s+'</option>';}).join('');
+  var gd=GUILDS.map(function(g){return '<option>'+g+'</option>';}).join('');
+  return `
+  <p class="lead">Support NeRO and receive Cash Points. Logged in as <b style="color:var(--gold)">${Auth.user()||'Adventurer'}</b>.</p>
+  <label class="fld">Choose amount</label><div class="amt-grid">${amts}</div>
+  <label class="fld">Support a streamer</label>
+  <select class="inp" id="don-streamer" onchange="updateSummary()"><option value="">— None —</option>${st}</select>
+  <div class="hintline">Get 10% bonus by choosing the streamer you want to support.</div>
+  <label class="fld">Support your guild</label>
+  <select class="inp" id="don-guild" onchange="updateSummary()"><option value="">— None —</option>${gd}</select>
+  <div class="hintline">Support your guild leader by mentioning your guild.</div>
+  <div class="summary" id="don-summary">Select an amount to see your total.</div>
+  <div id="don-msg"></div>
+  <button class="btn-gold" id="don-btn" onclick="doDonate()">Proceed to Payment</button>`;
 }
 
 function pickAmt(i){ selAmt=i;
@@ -303,7 +346,8 @@ async function refreshOnline(){
   sessionStorage.setItem('nero_online',ONLINE);
   paintOnline();
 }
-/* Online counter UI removed for now — no need to poll. */
+setInterval(refreshOnline, NeroAPI.enabled()? 30000 : 5000);
+refreshOnline();
 
 /* ================= MUSIC PLAYER ================= */
 var bgm=document.getElementById('bgm');
