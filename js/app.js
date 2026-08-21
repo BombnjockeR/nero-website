@@ -549,6 +549,7 @@ async function loadAccountPage(){
     if(chars.length){
       cb.innerHTML=chars.map(function(c){
         var online = Number(c.online)===1;
+        var dis = online ? 'disabled title="Character must be offline"' : '';
         return '<tr>'+
           '<td><b>'+c.name+'</b></td>'+
           '<td>'+jobName(Number(c.class))+'</td>'+
@@ -557,10 +558,15 @@ async function loadAccountPage(){
           '<td>'+fmtNum(c.zeny)+'</td>'+
           '<td>'+(c.guild||'—')+'</td>'+
           '<td><span class="pill '+(online?'on':'off')+'">'+(online?'Online':'Offline')+'</span></td>'+
+          '<td><div class="row-actions">'+
+            '<button class="act-btn" '+dis+' onclick="doResetLook('+c.char_id+',this)">Reset Look</button>'+
+            '<button class="act-btn" '+dis+' onclick="doResetPos('+c.char_id+',this)">Unstuck</button>'+
+            '<button class="act-btn" '+dis+' onclick="doChangeSlot('+c.char_id+','+c.char_num+',this)">Change Slot</button>'+
+          '</div></td>'+
         '</tr>';
       }).join('');
     }else{
-      cb.innerHTML='<tr><td colspan="7" class="norow">'+
+      cb.innerHTML='<tr><td colspan="8" class="norow">'+
         (demo ? 'Connect the backend to see your characters.' : 'No characters on this account yet.')+
         '</td></tr>';
     }
@@ -594,6 +600,33 @@ async function loadAccountPage(){
         '</td></tr>';
     }
   }
+}
+
+/* ---- Character management (mirrors FluxCP: reset look / unstuck / change slot) ---- */
+async function doResetLook(charId, btn){
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'resetlook',char_id:charId});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Look reset.') : ((res&&res.error)||'Could not reset look.'));
+  if(res&&res.ok) loadAccountPage();
+}
+async function doResetPos(charId, btn){
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'resetpos',char_id:charId});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Location reset.') : ((res&&res.error)||'Could not reset location.'));
+  if(res&&res.ok) loadAccountPage();
+}
+async function doChangeSlot(charId, currentNum, btn){
+  var slot=prompt('Move to which slot number? (1-9, currently #'+(currentNum+1)+')');
+  if(slot===null) return;
+  slot=parseInt(slot,10);
+  if(!slot||slot<1) return alert('Enter a valid slot number.');
+  if(btn){ btn.disabled=true; }
+  var res=await NeroAPI.post('/character.php',{action:'changeslot',char_id:charId,slot:slot});
+  if(btn){ btn.disabled=false; }
+  alert((res&&res.ok) ? (res.data&&res.data.message||'Slot changed.') : ((res&&res.error)||'Could not change slot.'));
+  if(res&&res.ok) loadAccountPage();
 }
 
 async function doChangePassword(){
