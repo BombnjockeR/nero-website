@@ -240,23 +240,9 @@ function serverHTML(){ var s=SERVER_INFO; return `
 /* ---- Donation (1 CP : 1 Rp) ---- */
 var selAmt=null;
 function donationHTML(){
-  var amts=DONATE_AMOUNTS.map(function(a,i){
-    return '<div class="amt" data-i="'+i+'" onclick="pickAmt('+i+')">'+
-      '<div class="cp">'+fmtNum(a.cp)+' CP</div><div class="lbl">'+fmtRp(a.cp)+'</div></div>';}).join('');
-  var st=STREAMERS.map(function(s){return '<option>'+s+'</option>';}).join('');
-  var gd=GUILDS.map(function(g){return '<option>'+g+'</option>';}).join('');
-  return `
-  <p class="lead">Support NeRO and receive Cash Points. Logged in as <b style="color:var(--gold)">${Auth.user()||'Adventurer'}</b>.</p>
-  <label class="fld">Choose amount</label><div class="amt-grid">${amts}</div>
-  <label class="fld">Support a streamer</label>
-  <select class="inp" id="don-streamer" onchange="updateSummary()"><option value="">— None —</option>${st}</select>
-  <div class="hintline">Get 10% bonus by choosing the streamer you want to support.</div>
-  <label class="fld">Support your guild</label>
-  <select class="inp" id="don-guild" onchange="updateSummary()"><option value="">— None —</option>${gd}</select>
-  <div class="hintline">Support your guild leader by mentioning your guild.</div>
-  <div class="summary" id="don-summary">Select an amount to see your total.</div>
-  <div id="don-msg"></div>
-  <button class="btn-gold" id="don-btn" onclick="doDonate()">Proceed to Payment</button>`;
+  return `<div class="soon-panel"><i class="ti ti-clock-hour-4"></i>
+    <h3>Coming Soon</h3>
+    <p>Donations and Cash Point top-ups are being finished up. Check back soon!</p></div>`;
 }
 
 function pickAmt(i){ selAmt=i;
