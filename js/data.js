@@ -3,7 +3,7 @@
    Bridge API running alongside FluxCP on the VPS.
    Set API_BASE to "" to fall back to mock/demo data.
    ================================================================= */
-const API_BASE = "https://api.newera-ro.com";
+const API_BASE = "https://srv.newera-ro.com";
 
 const NeroAPI = {
   enabled(){ return typeof API_BASE === "string" && API_BASE.length > 0; },
